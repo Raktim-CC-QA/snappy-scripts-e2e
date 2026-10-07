@@ -1,0 +1,823 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "D:\\Projects\\Snappy\\snappy-scripts-e2e\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "tests/08-full-order-flow.spec.js",
+      "--project=Desktop Chrome",
+      "--headed"
+    ],
+    "configFile": "D:\\Projects\\Snappy\\snappy-scripts-e2e\\playwright.config.js",
+    "rootDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Desktop Chrome",
+        "name": "Desktop Chrome",
+        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Desktop Firefox",
+        "name": "Desktop Firefox",
+        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "2K (2560x1440)",
+        "name": "2K (2560x1440)",
+        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "4K (3840x2160)",
+        "name": "4K (3840x2160)",
+        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "iPad Pro 11",
+        "name": "iPad Pro 11",
+        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "iPad Pro 12.9",
+        "name": "iPad Pro 12.9",
+        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "iPad Mini",
+        "name": "iPad Mini",
+        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "iPhone 14 Pro",
+        "name": "iPhone 14 Pro",
+        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "iPhone 14",
+        "name": "iPhone 14",
+        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "iPhone SE",
+        "name": "iPhone SE",
+        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "reports/html-report"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "reports/test-results.json"
+        }
+      ],
+      [
+        "list",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 6,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "08-full-order-flow.spec.js",
+      "file": "08-full-order-flow.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Full Order Flow — Homepage to Order Confirmation",
+          "file": "08-full-order-flow.spec.js",
+          "line": 2618,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TC-FLOW-E2E-001: Complete purchase funnel end-to-end",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 540000,
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Projects\\Snappy\\snappy-scripts-e2e\\tests\\08-full-order-flow.spec.js",
+                        "line": 2618,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 139470,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "\n[STEP 0] Preparing verification images...\n"
+                        },
+                        {
+                          "text": "   • idFront: generated placeholder D:\\Projects\\Snappy\\snappy-scripts-e2e\\test-results\\upload-fixtures\\id-front.png\n"
+                        },
+                        {
+                          "text": "   • idBack: generated placeholder D:\\Projects\\Snappy\\snappy-scripts-e2e\\test-results\\upload-fixtures\\id-back.png\n"
+                        },
+                        {
+                          "text": "   • selfie: generated placeholder D:\\Projects\\Snappy\\snappy-scripts-e2e\\test-results\\upload-fixtures\\selfie.png\n"
+                        },
+                        {
+                          "text": "\n[STEP 1] Homepage: https://staging.snappyscripts.com\n"
+                        },
+                        {
+                          "text": "   ✓ Browser window maximized (CDP)\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\01-homepage.png\n"
+                        },
+                        {
+                          "text": "   ✓ Title: \"Snappy Scripts - Now access healthcare from your own home\"\n"
+                        },
+                        {
+                          "text": "\n[STEP 2] Navigating to a product page...\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\02-pdp.png\n"
+                        },
+                        {
+                          "text": "   ✓ PDP URL: https://staging.snappyscripts.com/nd-in\n"
+                        },
+                        {
+                          "text": "\n[STEP 3] Starting questionnaire / intake...\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\03-questionnaire-start.png\n"
+                        },
+                        {
+                          "text": "   • URL: https://staging.snappyscripts.com/nd-in-qualify?type=start\n"
+                        },
+                        {
+                          "text": "\n[STEP 4] Filling questionnaire (semantic-intent)...\n"
+                        },
+                        {
+                          "text": "   → Sub-step 1: https://staging.snappyscripts.com/nd-in-qualify?type=start\n"
+                        },
+                        {
+                          "text": "      🧠 Found 1 question group(s)\n"
+                        },
+                        {
+                          "text": "      ✓ Q: \"Start Preliminary Health Details Eligibility How can we help\" → \"Improve Focus & Memory\"\n"
+                        },
+                        {
+                          "text": "      [pass 1] ✓ Answered 1 option(s)\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked advance: \"Continue\"\n"
+                        },
+                        {
+                          "text": "   → Sub-step 2: https://staging.snappyscripts.com/nd-in-qualify?type=start\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked first .custom-radio-circle\n"
+                        },
+                        {
+                          "text": "      ✓ Filled 1 Snappy custom widget(s)\n"
+                        },
+                        {
+                          "text": "      🧠 Found 1 question group(s)\n"
+                        },
+                        {
+                          "text": "      ✓ Q: \"Start Preliminary Health Details Eligibility How would you d\" → \"Excellent\"\n"
+                        },
+                        {
+                          "text": "      [pass 1] ✓ Answered 1 option(s)\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked advance: \"Continue\"\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\04-questionnaire-step-2.png\n"
+                        },
+                        {
+                          "text": "   → Sub-step 3: https://staging.snappyscripts.com/nd-in-qualify?type=start\n"
+                        },
+                        {
+                          "text": "      ⚡ forceClickUnselectedWidgets found nothing to click\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked advance: \"Continue\"\n"
+                        },
+                        {
+                          "text": "   → Sub-step 4: https://staging.snappyscripts.com/nd-in-qualify?type=profile\n"
+                        },
+                        {
+                          "text": "      ✓ Filled 1 text input(s)\n"
+                        },
+                        {
+                          "text": "      ✓ Filled DOB selects (3/3)\n"
+                        },
+                        {
+                          "text": "      ✓ Filled 3 Snappy custom widget(s)\n"
+                        },
+                        {
+                          "text": "      ⚡ forceClickUnselectedWidgets found nothing to click\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked advance: \"Next\"\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\05-questionnaire-step-4.png\n"
+                        },
+                        {
+                          "text": "   → Sub-step 5: https://staging.snappyscripts.com/nd-in-qualify?type=profile\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked first .custom-radio-circle\n"
+                        },
+                        {
+                          "text": "      ✓ Filled 1 Snappy custom widget(s)\n"
+                        },
+                        {
+                          "text": "      🧠 Found 1 question group(s)\n"
+                        },
+                        {
+                          "text": "      ✓ Q: \"Start Preliminary Health Details Eligibility Tell us a bit a\" → \"Male\" (already selected)\n"
+                        },
+                        {
+                          "text": "      [pass 1] ✓ Answered 1 option(s)\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked advance: \"Next\"\n"
+                        },
+                        {
+                          "text": "   → Sub-step 6: https://staging.snappyscripts.com/nd-in-qualify?type=profile\n"
+                        },
+                        {
+                          "text": "      ⚡ forceClickUnselectedWidgets found nothing to click\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked advance: \"Next\"\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\06-questionnaire-step-6.png\n"
+                        },
+                        {
+                          "text": "   → Sub-step 7: https://staging.snappyscripts.com/nd-in-qualify?type=profile\n"
+                        },
+                        {
+                          "text": "      ⚡ forceClickUnselectedWidgets found nothing to click\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked advance: \"Next\"\n"
+                        },
+                        {
+                          "text": "   → Sub-step 8: https://staging.snappyscripts.com/nd-in-qualify?type=profile\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked first .list-item-row\n"
+                        },
+                        {
+                          "text": "      ✓ Filled 1 Snappy custom widget(s)\n"
+                        },
+                        {
+                          "text": "      🧠 Found 1 question group(s)\n"
+                        },
+                        {
+                          "text": "      ✓ Q: \"Your Health Comes First We'll review these details carefully\" → \"None of the below\" (already selected)\n"
+                        },
+                        {
+                          "text": "      [pass 1] ✓ Answered 1 option(s)\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked advance: \"Next\"\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\07-questionnaire-step-8.png\n"
+                        },
+                        {
+                          "text": "   → Sub-step 9: https://staging.snappyscripts.com/nd-in-qualify?type=profile\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked first .custom-radio-circle\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked first .list-item-row\n"
+                        },
+                        {
+                          "text": "      ✓ Filled 2 Snappy custom widget(s)\n"
+                        },
+                        {
+                          "text": "      🧠 Found 1 question group(s)\n"
+                        },
+                        {
+                          "text": "      ⚠ Q: \"Start Preliminary Health Details Eligibility Safety first Do\" → NOT CLICKED (no-locator)\n"
+                        },
+                        {
+                          "text": "      ⚡ forceClickUnselectedWidgets clicked 1: No\n"
+                        },
+                        {
+                          "text": "   → Dismissed overlay (tag=span)\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked advance: \"Continue\"\n"
+                        },
+                        {
+                          "text": "   → Sub-step 10: https://staging.snappyscripts.com/nd-in-qualify?type=profile\n"
+                        },
+                        {
+                          "text": "      ⚡ forceClickUnselectedWidgets found nothing to click\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked advance: \"Next\"\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\08-questionnaire-step-10.png\n"
+                        },
+                        {
+                          "text": "   → Sub-step 11: https://staging.snappyscripts.com/nd-in-qualify?type=profile\n"
+                        },
+                        {
+                          "text": "      ✓ Filled \"Nothing to add\" textarea\n"
+                        },
+                        {
+                          "text": "      ✓ Filled 1 Snappy custom widget(s)\n"
+                        },
+                        {
+                          "text": "      ⚡ forceClickUnselectedWidgets found nothing to click\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked advance: \"Continue\"\n"
+                        },
+                        {
+                          "text": "   → Sub-step 12: https://staging.snappyscripts.com/nd-in-qualify?type=profile\n"
+                        },
+                        {
+                          "text": "      ⚡ forceClickUnselectedWidgets found nothing to click\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked advance: \"Continue to see if you qualify\"\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\09-questionnaire-step-12.png\n"
+                        },
+                        {
+                          "text": "   → Sub-step 13: https://staging.snappyscripts.com/nd-in-qualify?type=qualified\n"
+                        },
+                        {
+                          "text": "   ✓ Signup form detected (attempt 1) — filling it\n"
+                        },
+                        {
+                          "text": "      → Filling signup form...\n"
+                        },
+                        {
+                          "text": "      ✓ Signup form touched 7 field(s)\n"
+                        },
+                        {
+                          "text": "      ✓ All required fields verified populated\n"
+                        },
+                        {
+                          "text": "      📧 Signup email in use: qa+1791296584380@yopmail.com\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked signup Submit\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\10-signup-form-13.png\n"
+                        },
+                        {
+                          "text": "   → Sub-step 14: https://staging.snappyscripts.com/nd-in-personalize-plan\n"
+                        },
+                        {
+                          "text": "   ✓ Reached plan/checkout page: https://staging.snappyscripts.com/nd-in-personalize-plan\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\11-after-questionnaire.png\n"
+                        },
+                        {
+                          "text": "\n[STEP 5] Checkout / payment handling...\n"
+                        },
+                        {
+                          "text": "   ✓ Selected plan: Monthly Plan (4 Week Supply) (visible matches=1)\n"
+                        },
+                        {
+                          "text": "   • Address attempt 1: typed \"test\"\n"
+                        },
+                        {
+                          "text": "   ✓ Picked address suggestion \"6202 E Test Dr Mesa, AZ 85206\"\n"
+                        },
+                        {
+                          "text": "   ✓ Delivery address selected via suggestion: \"6202 E Test Dr\"\n"
+                        },
+                        {
+                          "text": "   ✓ Filled card details\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\12-checkout-filled.png\n"
+                        },
+                        {
+                          "text": "\n[STEP 6] Submitting order...\n"
+                        },
+                        {
+                          "text": "   ✓ Clicked pay/submit button → URL now https://staging.snappyscripts.com/nd-in-complete-verification\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\13-after-submit.png\n"
+                        },
+                        {
+                          "text": "\n[STEP 6.5] Handling post-checkout verification + image uploads...\n"
+                        },
+                        {
+                          "text": "      → Handling verification flow: https://staging.snappyscripts.com/nd-in-complete-verification\n"
+                        },
+                        {
+                          "text": "   → Verify sub-step 1: https://staging.snappyscripts.com/nd-in-complete-verification\n"
+                        },
+                        {
+                          "text": "      📎 Uploaded selfie → file input #0\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\14-verify-step-1.png\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked verification advance: \"Continue to Next Step\"\n"
+                        },
+                        {
+                          "text": "   → Dismissed overlay: button:has-text(\"No, thanks\")\n"
+                        },
+                        {
+                          "text": "   → Verify sub-step 2: https://staging.snappyscripts.com/customer/dashboard\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\15-verify-step-2.png\n"
+                        },
+                        {
+                          "text": "      ⚠ No enabled Continue/Submit on verify step 2\n"
+                        },
+                        {
+                          "text": "   🧾 DOM dumped: test-results\\flow-steps\\verify-step-2-blocked.html\n"
+                        },
+                        {
+                          "text": "   → Verify sub-step 3: https://staging.snappyscripts.com/customer/dashboard\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\16-verify-step-3.png\n"
+                        },
+                        {
+                          "text": "      ⚠ No enabled Continue/Submit on verify step 3\n"
+                        },
+                        {
+                          "text": "   🧾 DOM dumped: test-results\\flow-steps\\verify-step-3-blocked.html\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\17-after-verification.png\n"
+                        },
+                        {
+                          "text": "   • No further checkout/verification page detected (url=https://staging.snappyscripts.com/customer/dashboard)\n"
+                        },
+                        {
+                          "text": "\n[STEP 7] Verifying order confirmation...\n"
+                        },
+                        {
+                          "text": "   ✓ Final URL: https://staging.snappyscripts.com/customer/dashboard\n"
+                        },
+                        {
+                          "text": "      🧾 Order ID candidate \"B291D20E5F\" (source: confirmation)\n"
+                        },
+                        {
+                          "text": "   ✅ Confirmation detected — Order ID: B291D20E5F\n"
+                        },
+                        {
+                          "text": "   ✅ \"Cancel Treatment\" control visible — order is placed\n"
+                        },
+                        {
+                          "text": "\n[STEP 7.5] Clicking Cancel Treatment and completing the cancellation...\n"
+                        },
+                        {
+                          "text": "      🧾 Order ID candidate \"B291D20E5F\" (source: cancel-page)\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked \"Cancel Treatment\"\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\18-cancel-treatment-clicked.png\n"
+                        },
+                        {
+                          "text": "      ✓ Clicked cancel confirmation: \"Cancel Treatment\"\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\19-cancel-treatment-confirm-1.png\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\20-cancel-treatment-final.png\n"
+                        },
+                        {
+                          "text": "   ✅ Cancellation message detected\n"
+                        },
+                        {
+                          "text": "\n════════════════════════════════════════════════════════════\n"
+                        },
+                        {
+                          "text": " 🛑 TREATMENT CANCELLED — ORDER DETAILS\n"
+                        },
+                        {
+                          "text": "════════════════════════════════════════════════════════════\n"
+                        },
+                        {
+                          "text": " 📧 Email ID : qa+1791296584380@yopmail.com\n"
+                        },
+                        {
+                          "text": " 🧾 Order ID : B291D20E5F\n"
+                        },
+                        {
+                          "text": "    (source: cancel-page)\n"
+                        },
+                        {
+                          "text": "    other candidates: B291D20E5F [confirmation], B291D20E5F [cancel-page]\n"
+                        },
+                        {
+                          "text": " ✅ Cancelled: yes (confirmed in app)\n"
+                        },
+                        {
+                          "text": "════════════════════════════════════════════════════════════\n\n"
+                        },
+                        {
+                          "text": "\n[STEP 7.6] Opening Order History and verifying the order shows Cancelled...\n"
+                        },
+                        {
+                          "text": "      → Clicking \"order\\s*history\" to reach order history\n"
+                        },
+                        {
+                          "text": "      ✓ Order History opened (link order\\s*history): https://staging.snappyscripts.com/customer/dashboard\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\21-order-history-opened.png\n"
+                        },
+                        {
+                          "text": "      🧾 Order ID candidate \"B291D20E5F\" (source: order-history)\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\22-order-history-final.png\n"
+                        },
+                        {
+                          "text": "      ✓ Order History shows: \"Treatment Canceled\"\n"
+                        },
+                        {
+                          "text": "\n════════════════════════════════════════════════════════════\n"
+                        },
+                        {
+                          "text": " 🛑 ORDER HISTORY CHECK — EMAIL + ORDER ID\n"
+                        },
+                        {
+                          "text": "════════════════════════════════════════════════════════════\n"
+                        },
+                        {
+                          "text": " 📧 Email ID : qa+1791296584380@yopmail.com\n"
+                        },
+                        {
+                          "text": " 🧾 Order ID : B291D20E5F\n"
+                        },
+                        {
+                          "text": "    (source: order-history)\n"
+                        },
+                        {
+                          "text": "    other candidates: B291D20E5F [confirmation], B291D20E5F [cancel-page], B291D20E5F [order-history]\n"
+                        },
+                        {
+                          "text": " ✅ Cancelled: yes (confirmed in app)\n"
+                        },
+                        {
+                          "text": "════════════════════════════════════════════════════════════\n\n"
+                        },
+                        {
+                          "text": "   ✅ Order History confirms cancellation: \"Treatment Canceled\"\n"
+                        },
+                        {
+                          "text": "\n[STEP 8] Post-run diagnostics...\n"
+                        },
+                        {
+                          "text": "\n═══════════════════════════════════════════════\n"
+                        },
+                        {
+                          "text": " ✅ ORDER PLACED, TREATMENT CANCELLED, ORDER HISTORY SHOWS CANCELLED\n"
+                        },
+                        {
+                          "text": " 📧 Email ID : qa+1791296584380@yopmail.com\n"
+                        },
+                        {
+                          "text": " 🧾 Order ID : B291D20E5F\n"
+                        },
+                        {
+                          "text": "═══════════════════════════════════════════════\n\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "text": "   ⚠ 2 console error(s):\n"
+                        },
+                        {
+                          "text": "      • Refused to apply style from 'https://staging.snappyscripts.com/frontend/css/snappy_scripts_custom.css' because its MIME type ('text/html') is not a su\n"
+                        },
+                        {
+                          "text": "      • Pattern attribute value ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z]{2,}$ is not a valid regular expression: Uncaught SyntaxError: Failed to execute 'ch\n"
+                        },
+                        {
+                          "text": "   ⚠ 80 failed request(s):\n"
+                        },
+                        {
+                          "text": "      • https://www.googletagmanager.com/gtag/js?id=G-QEDJZQKSZC → net::ERR_BLOCKED_BY_ORB\n"
+                        },
+                        {
+                          "text": "      • https://io.v2.customerlabs.co/cl → net::ERR_ABORTED\n"
+                        },
+                        {
+                          "text": "      • https://io.v2.customerlabs.co/cl → net::ERR_ABORTED\n"
+                        },
+                        {
+                          "text": "      • https://io.v2.customerlabs.co/cl → net::ERR_ABORTED\n"
+                        },
+                        {
+                          "text": "      • https://io.v2.customerlabs.co/cl → net::ERR_ABORTED\n"
+                        }
+                      ],
+                      "retry": 0,
+                      "startTime": "2026-10-06T14:23:04.385Z",
+                      "annotations": [
+                        {
+                          "type": "serial",
+                          "location": {
+                            "file": "D:\\Projects\\Snappy\\snappy-scripts-e2e\\tests\\08-full-order-flow.spec.js",
+                            "line": 2618,
+                            "column": 6
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d74bd6aebf9ec0899685-a242bbcfb44b4077359c",
+              "file": "08-full-order-flow.spec.js",
+              "line": 2621,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-06T14:23:03.764Z",
+    "duration": 141592.96399999998,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

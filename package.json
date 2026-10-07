@@ -1,0 +1,26 @@
+{
+  "name": "snappy-scripts-e2e",
+  "version": "1.0.0",
+  "description": "E2E test automation for Snappy Scripts telemed platform",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:links": "playwright test tests/01-broken-links.spec.js",
+    "test:responsive": "playwright test tests/02-responsiveness.spec.js",
+    "test:seo": "playwright test tests/03-seo-geo-aeo-analytics.spec.js",
+    "test:perf": "playwright test tests/04-performance.spec.js",
+    "test:legit": "playwright test tests/05-legitscript-content.spec.js",
+    "test:security": "playwright test tests/06-security-vulnerabilities.spec.js",
+    "test:flows": "playwright test tests/07-user-flows.spec.js",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.6.2",
+    "axios": "^1.20.0",
+    "cheerio": "^1.2.0",
+    "dotenv": "^18.0.2",
+    "lighthouse": "^12.8.2",
+    "playwright-lighthouse": "^4.0.0"
+  }
+}
