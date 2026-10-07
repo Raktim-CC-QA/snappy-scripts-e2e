@@ -1,30 +1,23 @@
-name: Test
+name: Playwright Tests
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch:  # Allows you to run it manually
+  workflow_dispatch:
 
 jobs:
   test:
-    # 1. Pin the runner to a specific Ubuntu version to avoid the
-    #    "ubuntu-latest will migrate to Ubuntu 26" notice.
-    #    Use ubuntu-24.04 for stability, or ubuntu-26.04 to test the new image.
     runs-on: ubuntu-24.04
 
-    # 2. Set a sensible timeout so a hanging job fails fast instead of
-    #    running for the default 6 hours. Tune this to your real needs.
-    timeout-minutes: 30
+    # Generous but not absurd. With the reduced matrix this should be plenty.
+    timeout-minutes: 60
 
-    # 3. Force JavaScript actions to use Node 24, silencing the
-    #    Node 20 deprecation warning until all actions are updated.
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
-      # 4. Use the Node 24-compatible versions of the standard actions.
       - name: Checkout code
         uses: actions/checkout@v5
 
@@ -32,19 +25,31 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: '24'
-          cache: 'npm'  # Or 'yarn' / 'pnpm' depending on your project
-
-      # --- Replace everything below with YOUR actual build/test steps ---
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
-        # Use `npm ci` instead of `npm install` for CI — it's faster and reproducible.
 
-      - name: Run tests
-        # IMPORTANT: Make sure this command terminates on its own.
-        # Add `--ci --runInBand` (Jest) or equivalent if tests were hanging.
-        run: npm test
-        timeout-minutes: 15  # Per-step timeout as an extra safety net.
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
 
-      - name: Build
-        run: npm run build
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        # 4 workers in parallel; drop to 2 if you see flakiness.
+        run: npx playwright test --workers=4
+        timeout-minutes: 50
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
