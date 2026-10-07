@@ -1,14 +1,50 @@
-name: CI
+name: Test
 
-on: [push]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # Allows you to run it manually
 
 jobs:
-  run-script:
-    runs-on: ubuntu-latest
+  test:
+    # 1. Pin the runner to a specific Ubuntu version to avoid the
+    #    "ubuntu-latest will migrate to Ubuntu 26" notice.
+    #    Use ubuntu-24.04 for stability, or ubuntu-26.04 to test the new image.
+    runs-on: ubuntu-24.04
+
+    # 2. Set a sensible timeout so a hanging job fails fast instead of
+    #    running for the default 6 hours. Tune this to your real needs.
+    timeout-minutes: 30
+
+    # 3. Force JavaScript actions to use Node 24, silencing the
+    #    Node 20 deprecation warning until all actions are updated.
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      # 4. Use the Node 24-compatible versions of the standard actions.
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
         with:
-          node-version: '20'
-      - run: npm install
-      - run: npm test
+          node-version: '24'
+          cache: 'npm'  # Or 'yarn' / 'pnpm' depending on your project
+
+      # --- Replace everything below with YOUR actual build/test steps ---
+
+      - name: Install dependencies
+        run: npm ci
+        # Use `npm ci` instead of `npm install` for CI — it's faster and reproducible.
+
+      - name: Run tests
+        # IMPORTANT: Make sure this command terminates on its own.
+        # Add `--ci --runInBand` (Jest) or equivalent if tests were hanging.
+        run: npm test
+        timeout-minutes: 15  # Per-step timeout as an extra safety net.
+
+      - name: Build
+        run: npm run build
