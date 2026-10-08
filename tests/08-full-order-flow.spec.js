@@ -2,6 +2,11 @@
 /**
  * Full Order Flow E2E Test (v22)
  * ==============================
+ * v22.1 — DIAGNOSTICS: when the order is not completed, STEP 7 now logs every
+ *   visible input/button, saves step7-final-state.png/.html and puts the
+ *   approved-checkout result + a page snippet in the assertion message, and
+ *   completeApprovedCheckout() logs the visible controls when it gives up.
+ *
  * v22 CHANGES — building on v21:
  *
  *  FIX J1 — verification wizard on the same /approved-secure-checkout URL
@@ -1976,6 +1981,10 @@ async function completeApprovedCheckout(page, cfg) {
       if (idle >= 3) break;
     }
   }
+  console.warn(`      ⚠ Approved-checkout gave up: ${JSON.stringify(out)} at ${page.url()}`);
+  await logVisibleControls(page, 'approved-checkout gave up');
+  await snapshot(page, 'approved-checkout-gave-up');
+  await dumpDom(page, 'approved-checkout-gave-up');
   return out;
 }
 
@@ -2978,6 +2987,7 @@ test.describe('Full Order Flow — Homepage to Order Confirmation', () => {
     let verificationRan = false;
     let verificationAdvanced = false;
     let approvedDone = false;
+    let lastApproved = null;
 
     const runVerification = async () => {
       verificationRan = true;
@@ -3007,6 +3017,7 @@ test.describe('Full Order Flow — Homepage to Order Confirmation', () => {
       if (await isApprovedCheckoutPage(page)) {
         console.log(`   • Approved/secure-checkout page detected (round ${round}): ${page.url()}`);
         const r = await completeApprovedCheckout(page, CONFIG);
+        lastApproved = r;
         await snapshot(page, `after-approved-checkout-${round}`);
         if (r.done) { approvedDone = true; break; }
         if (r.handoff === 'verification') await runVerification();
@@ -3055,10 +3066,18 @@ test.describe('Full Order Flow — Homepage to Order Confirmation', () => {
     if (cancelAvailable) console.log('   ✅ "Cancel Treatment" control visible — order is placed');
     const orderSucceeded = confirmed || approvedDone || cancelAvailable ||
       (verificationRan && verificationAdvanced && !stillOnVerification);
+    if (!orderSucceeded) {
+      await logVisibleControls(page, 'STEP 7 final state');
+      await snapshot(page, 'step7-final-state');
+      await dumpDom(page, 'step7-final-state');
+    }
+    const finalSnippet = (await bodySnippet(page)).slice(0, 300);
     expect(
       orderSucceeded,
       `Order not completed. Final URL: ${finalUrl}. ` +
-      `Check test-results/flow-steps/verify-step-* screenshots/DOM dumps.`
+      `approvedCheckout=${JSON.stringify(lastApproved)}; verificationRan=${verificationRan}; ` +
+      `verificationAdvanced=${verificationAdvanced}. Page: "${finalSnippet}". ` +
+      `Check test-results/flow-steps/step7-final-state.* and approved-checkout-* dumps.`
     ).toBe(true);
 
     // STEP 7.5 — CANCEL TREATMENT (v19 FIX G1)
