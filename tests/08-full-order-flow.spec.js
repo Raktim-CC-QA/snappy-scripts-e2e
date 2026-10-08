@@ -1,7 +1,28 @@
 // tests/08-full-order-flow.spec.js
 /**
- * Full Order Flow E2E Test (v21)
+ * Full Order Flow E2E Test (v22)
  * ==============================
+ * v22 CHANGES — building on v21:
+ *
+ *  FIX J1 — verification wizard on the same /approved-secure-checkout URL
+ *  ----------------------------------------------------------------------
+ *  STEP 6.5 used to test isApprovedCheckoutPage() BEFORE the verification
+ *  wizard. If the wizard renders on the same URL, the URL regex kept matching,
+ *  completeVerification() never ran and STEP 7 failed with that URL. Now the
+ *  wizard is checked first, and an approved-checkout "verification" handoff
+ *  runs completeVerification() immediately.
+ *
+ *  FIX J2 — maximizeBrowser only on headed desktop Chromium
+ *  --------------------------------------------------------
+ *  The CDP call fails on Firefox, and the fallback resized the viewport to the
+ *  screen size, which broke iPhone emulation. It is now skipped on non-Chromium,
+ *  mobile projects and CI.
+ *
+ *  FIX J3 — wait for "Cancel Treatment" before judging the order
+ *  -------------------------------------------------------------
+ *  cancelAvailable used to be read instantly after the last click. It now waits
+ *  up to 8s via waitForCancelTrigger().
+ *
  * v21 CHANGES — building on v20:
  *
  *  FIX I1 — delivery address never really got selected
@@ -273,6 +294,7 @@ async function fillIfVisible(locator, value, timeout = CONFIG.timeouts.short) {
 /**
  * v18 FIX F1 — maximize the headed Chrome window via CDP.
  * Falls back to resizing the viewport to the screen's available size.
+ * v22 FIX J2: the caller only invokes this on headed desktop Chromium.
  */
 async function maximizeBrowser(page, context) {
   try {
@@ -2618,7 +2640,8 @@ async function verifyCancelledInOrderHistory(page, baseUrl) {
 test.describe('Full Order Flow — Homepage to Order Confirmation', () => {
   test.describe.configure({ mode: 'serial' });
 
-  test('TC-FLOW-E2E-001: Complete purchase funnel end-to-end', async ({ page, context }) => {
+  // v22 FIX J2: browserName + isMobile are used to decide whether to maximize the window
+  test('TC-FLOW-E2E-001: Complete purchase funnel end-to-end', async ({ page, context, browserName, isMobile }) => {
     const consoleErrors = [];
     const failedRequests = [];
     page.on('console', m => { if (m.type() === 'error') consoleErrors.push(m.text()); });
@@ -2652,8 +2675,13 @@ test.describe('Full Order Flow — Homepage to Order Confirmation', () => {
     await page.goto(CONFIG.baseUrl, { waitUntil: 'domcontentloaded', timeout: CONFIG.timeouts.long });
     await page.waitForLoadState('networkidle', { timeout: CONFIG.timeouts.medium }).catch(() => {});
 
-    // maximize the browser once the landing page has loaded
-    await maximizeBrowser(page, context);
+    // v22 FIX J2 — maximize only on headed desktop Chromium (CDP is Chromium-only,
+    // and the viewport fallback would break mobile emulation on CI)
+    if (browserName === 'chromium' && !isMobile && !process.env.CI) {
+      await maximizeBrowser(page, context);
+    } else {
+      console.log(`   • Skipping maximize (${browserName}${isMobile ? ', mobile' : ''}${process.env.CI ? ', CI' : ''})`);
+    }
 
     await dismissOverlays(page);
     await snapshot(page, 'homepage');
@@ -2950,28 +2978,38 @@ test.describe('Full Order Flow — Homepage to Order Confirmation', () => {
     let verificationRan = false;
     let verificationAdvanced = false;
     let approvedDone = false;
-    for (let round = 1; round <= 3; round++) {
+
+    const runVerification = async () => {
+      verificationRan = true;
+      const adv = await completeVerification(page, CONFIG.patient, images);
+      verificationAdvanced = verificationAdvanced || adv;
+      await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+      await page.waitForTimeout(2500);
+      await snapshot(page, 'after-verification');
+    };
+    const onVerifyNow = async () =>
+      /complete-verification|verify|identity/i.test(page.url()) ||
+      await page.locator('text=/Verify Your Identity/i').first()
+        .isVisible({ timeout: 1500 }).catch(() => false);
+
+    for (let round = 1; round <= 4; round++) {
       await waitForPageSettled(page, { timeout: 6000 });
+
+      // v22 FIX J1 — check the wizard FIRST: it can render on the
+      // /approved-secure-checkout URL, which would otherwise keep matching
+      // isApprovedCheckoutPage() and starve completeVerification().
+      if (await onVerifyNow()) {
+        await runVerification();
+        continue;
+      }
 
       // v21 FIX I2 — second checkout page (/nd-in-approved-secure-checkout)
       if (await isApprovedCheckoutPage(page)) {
         console.log(`   • Approved/secure-checkout page detected (round ${round}): ${page.url()}`);
         const r = await completeApprovedCheckout(page, CONFIG);
-        if (r.done) approvedDone = true;
         await snapshot(page, `after-approved-checkout-${round}`);
-        if (r.done) break;
-        continue;
-      }
-
-      const onVerifyNow = /complete-verification|verify|identity/i.test(page.url())
-        || await page.locator('text=/Verify Your Identity/i').first().isVisible({ timeout: 1500 }).catch(() => false);
-      if (onVerifyNow) {
-        verificationRan = true;
-        const adv = await completeVerification(page, CONFIG.patient, images);
-        verificationAdvanced = verificationAdvanced || adv;
-        await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
-        await page.waitForTimeout(2500);
-        await snapshot(page, 'after-verification');
+        if (r.done) { approvedDone = true; break; }
+        if (r.handoff === 'verification') await runVerification();
         continue;
       }
 
@@ -3012,7 +3050,8 @@ test.describe('Full Order Flow — Homepage to Order Confirmation', () => {
       console.warn(`   ⚠ Page snippet: ${body.substring(0, 300)}`);
     }
 
-    const cancelAvailable = (await cancelTriggers(page).count().catch(() => 0)) > 0;
+    // v22 FIX J3 — wait for the Cancel Treatment control instead of a one-shot check
+    const cancelAvailable = !!(await waitForCancelTrigger(page, 8000));
     if (cancelAvailable) console.log('   ✅ "Cancel Treatment" control visible — order is placed');
     const orderSucceeded = confirmed || approvedDone || cancelAvailable ||
       (verificationRan && verificationAdvanced && !stillOnVerification);

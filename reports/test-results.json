@@ -34,7 +34,10 @@
         "id": "Desktop Chrome",
         "name": "Desktop Chrome",
         "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
-        "testIgnore": [],
+        "testIgnore": [
+          "/02-responsiveness/",
+          "/04-performance/"
+        ],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
@@ -50,103 +53,10 @@
         "id": "Desktop Firefox",
         "name": "Desktop Firefox",
         "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
-        "testIgnore": [],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        "testIgnore": [
+          "/02-responsiveness/",
+          "/04-performance/"
         ],
-        "timeout": 30000
-      },
-      {
-        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
-        "repeatEach": 1,
-        "retries": 0,
-        "metadata": {
-          "actualWorkers": 1
-        },
-        "id": "2K (2560x1440)",
-        "name": "2K (2560x1440)",
-        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
-        "testIgnore": [],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
-        "timeout": 30000
-      },
-      {
-        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
-        "repeatEach": 1,
-        "retries": 0,
-        "metadata": {
-          "actualWorkers": 1
-        },
-        "id": "4K (3840x2160)",
-        "name": "4K (3840x2160)",
-        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
-        "testIgnore": [],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
-        "timeout": 30000
-      },
-      {
-        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
-        "repeatEach": 1,
-        "retries": 0,
-        "metadata": {
-          "actualWorkers": 1
-        },
-        "id": "iPad Pro 11",
-        "name": "iPad Pro 11",
-        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
-        "testIgnore": [],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
-        "timeout": 30000
-      },
-      {
-        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
-        "repeatEach": 1,
-        "retries": 0,
-        "metadata": {
-          "actualWorkers": 1
-        },
-        "id": "iPad Pro 12.9",
-        "name": "iPad Pro 12.9",
-        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
-        "testIgnore": [],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
-        "timeout": 30000
-      },
-      {
-        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
-        "repeatEach": 1,
-        "retries": 0,
-        "metadata": {
-          "actualWorkers": 1
-        },
-        "id": "iPad Mini",
-        "name": "iPad Mini",
-        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
-        "testIgnore": [],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
-        "timeout": 30000
-      },
-      {
-        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
-        "repeatEach": 1,
-        "retries": 0,
-        "metadata": {
-          "actualWorkers": 1
-        },
-        "id": "iPhone 14 Pro",
-        "name": "iPhone 14 Pro",
-        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
-        "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
@@ -162,7 +72,10 @@
         "id": "iPhone 14",
         "name": "iPhone 14",
         "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
-        "testIgnore": [],
+        "testIgnore": [
+          "/02-responsiveness/",
+          "/04-performance/"
+        ],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
@@ -178,9 +91,124 @@
         "id": "iPhone SE",
         "name": "iPhone SE",
         "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
-        "testIgnore": [],
+        "testIgnore": [
+          "/02-responsiveness/",
+          "/04-performance/"
+        ],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Lighthouse",
+        "name": "Lighthouse",
+        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/04-performance\\.spec\\.js/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "2K (2560x1440)",
+        "name": "2K (2560x1440)",
+        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/02-responsiveness\\.spec\\.js/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "4K (3840x2160)",
+        "name": "4K (3840x2160)",
+        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/02-responsiveness\\.spec\\.js/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "iPad Pro 11",
+        "name": "iPad Pro 11",
+        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/02-responsiveness\\.spec\\.js/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "iPad Pro 12.9",
+        "name": "iPad Pro 12.9",
+        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/02-responsiveness\\.spec\\.js/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "iPad Mini",
+        "name": "iPad Mini",
+        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/02-responsiveness\\.spec\\.js/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/Projects/Snappy/snappy-scripts-e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "iPhone 14 Pro",
+        "name": "iPhone 14 Pro",
+        "testDir": "D:/Projects/Snappy/snappy-scripts-e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/02-responsiveness\\.spec\\.js/"
         ],
         "timeout": 30000
       }
@@ -227,7 +255,7 @@
         {
           "title": "Full Order Flow — Homepage to Order Confirmation",
           "file": "08-full-order-flow.spec.js",
-          "line": 2618,
+          "line": 2640,
           "column": 6,
           "specs": [
             {
@@ -242,7 +270,7 @@
                       "type": "serial",
                       "location": {
                         "file": "D:\\Projects\\Snappy\\snappy-scripts-e2e\\tests\\08-full-order-flow.spec.js",
-                        "line": 2618,
+                        "line": 2640,
                         "column": 6
                       }
                     }
@@ -255,7 +283,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 139470,
+                      "duration": 312653,
                       "errors": [],
                       "stdout": [
                         {
@@ -520,7 +548,7 @@
                           "text": "      ✓ All required fields verified populated\n"
                         },
                         {
-                          "text": "      📧 Signup email in use: qa+1791296584380@yopmail.com\n"
+                          "text": "      📧 Signup email in use: qa+1791443908702@yopmail.com\n"
                         },
                         {
                           "text": "      ✓ Clicked signup Submit\n"
@@ -589,6 +617,9 @@
                           "text": "   → Dismissed overlay: button:has-text(\"No, thanks\")\n"
                         },
                         {
+                          "text": "   → Dismissed overlay (text=\"No, Thanks\")\n"
+                        },
+                        {
                           "text": "   → Verify sub-step 2: https://staging.snappyscripts.com/customer/dashboard\n"
                         },
                         {
@@ -625,10 +656,10 @@
                           "text": "   ✓ Final URL: https://staging.snappyscripts.com/customer/dashboard\n"
                         },
                         {
-                          "text": "      🧾 Order ID candidate \"B291D20E5F\" (source: confirmation)\n"
+                          "text": "      🧾 Order ID candidate \"95ED1E5C37\" (source: confirmation)\n"
                         },
                         {
-                          "text": "   ✅ Confirmation detected — Order ID: B291D20E5F\n"
+                          "text": "   ✅ Confirmation detected — Order ID: 95ED1E5C37\n"
                         },
                         {
                           "text": "   ✅ \"Cancel Treatment\" control visible — order is placed\n"
@@ -637,7 +668,7 @@
                           "text": "\n[STEP 7.5] Clicking Cancel Treatment and completing the cancellation...\n"
                         },
                         {
-                          "text": "      🧾 Order ID candidate \"B291D20E5F\" (source: cancel-page)\n"
+                          "text": "      🧾 Order ID candidate \"95ED1E5C37\" (source: cancel-page)\n"
                         },
                         {
                           "text": "      ✓ Clicked \"Cancel Treatment\"\n"
@@ -667,16 +698,16 @@
                           "text": "════════════════════════════════════════════════════════════\n"
                         },
                         {
-                          "text": " 📧 Email ID : qa+1791296584380@yopmail.com\n"
+                          "text": " 📧 Email ID : qa+1791443908702@yopmail.com\n"
                         },
                         {
-                          "text": " 🧾 Order ID : B291D20E5F\n"
+                          "text": " 🧾 Order ID : 95ED1E5C37\n"
                         },
                         {
                           "text": "    (source: cancel-page)\n"
                         },
                         {
-                          "text": "    other candidates: B291D20E5F [confirmation], B291D20E5F [cancel-page]\n"
+                          "text": "    other candidates: 95ED1E5C37 [confirmation], 95ED1E5C37 [cancel-page]\n"
                         },
                         {
                           "text": " ✅ Cancelled: yes (confirmed in app)\n"
@@ -697,7 +728,7 @@
                           "text": "   📸 test-results\\flow-steps\\21-order-history-opened.png\n"
                         },
                         {
-                          "text": "      🧾 Order ID candidate \"B291D20E5F\" (source: order-history)\n"
+                          "text": "      🧾 Order ID candidate \"95ED1E5C37\" (source: order-history)\n"
                         },
                         {
                           "text": "   📸 test-results\\flow-steps\\22-order-history-final.png\n"
@@ -715,16 +746,16 @@
                           "text": "════════════════════════════════════════════════════════════\n"
                         },
                         {
-                          "text": " 📧 Email ID : qa+1791296584380@yopmail.com\n"
+                          "text": " 📧 Email ID : qa+1791443908702@yopmail.com\n"
                         },
                         {
-                          "text": " 🧾 Order ID : B291D20E5F\n"
+                          "text": " 🧾 Order ID : 95ED1E5C37\n"
                         },
                         {
                           "text": "    (source: order-history)\n"
                         },
                         {
-                          "text": "    other candidates: B291D20E5F [confirmation], B291D20E5F [cancel-page], B291D20E5F [order-history]\n"
+                          "text": "    other candidates: 95ED1E5C37 [confirmation], 95ED1E5C37 [cancel-page], 95ED1E5C37 [order-history]\n"
                         },
                         {
                           "text": " ✅ Cancelled: yes (confirmed in app)\n"
@@ -745,10 +776,10 @@
                           "text": " ✅ ORDER PLACED, TREATMENT CANCELLED, ORDER HISTORY SHOWS CANCELLED\n"
                         },
                         {
-                          "text": " 📧 Email ID : qa+1791296584380@yopmail.com\n"
+                          "text": " 📧 Email ID : qa+1791443908702@yopmail.com\n"
                         },
                         {
-                          "text": " 🧾 Order ID : B291D20E5F\n"
+                          "text": " 🧾 Order ID : 95ED1E5C37\n"
                         },
                         {
                           "text": "═══════════════════════════════════════════════\n\n"
@@ -784,13 +815,13 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-10-06T14:23:04.385Z",
+                      "startTime": "2026-10-08T07:18:28.711Z",
                       "annotations": [
                         {
                           "type": "serial",
                           "location": {
                             "file": "D:\\Projects\\Snappy\\snappy-scripts-e2e\\tests\\08-full-order-flow.spec.js",
-                            "line": 2618,
+                            "line": 2640,
                             "column": 6
                           }
                         }
@@ -803,7 +834,7 @@
               ],
               "id": "d74bd6aebf9ec0899685-a242bbcfb44b4077359c",
               "file": "08-full-order-flow.spec.js",
-              "line": 2621,
+              "line": 2644,
               "column": 3
             }
           ]
@@ -813,8 +844,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-10-06T14:23:03.764Z",
-    "duration": 141592.96399999998,
+    "startTime": "2026-10-08T07:18:27.018Z",
+    "duration": 316315.41400000005,
     "expected": 1,
     "skipped": 0,
     "unexpected": 0,
