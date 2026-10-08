@@ -2,6 +2,15 @@
 /**
  * Full Order Flow E2E Test (v22)
  * ==============================
+ * v23 — APPROVED-CHECKOUT FIXES (from CI run #8: approvedCheckout advanced=false,
+ *   page stuck on "Your Treatment Details" / "Dosage Tailored To Your Treatment Plan"):
+ *   - K1 selectDosageIfPresent(): explicitly picks a dosage option in the Dosage section
+ *   - K2 fillBasicDetails() accepts a skip regex; on the approved page promo/coupon/
+ *        discount/referral/gift inputs are NOT filled with "Test" (it could invalidate
+ *        the already-applied code SNAPPY180 and block the final button)
+ *   - K3 validation errors are logged after every click without progress / no button
+ *   - K4 the CI failure message now carries the visible buttons/inputs + validation errors
+ *
  * v22.1 — DIAGNOSTICS: when the order is not completed, STEP 7 now logs every
  *   visible input/button, saves step7-final-state.png/.html and puts the
  *   approved-checkout result + a page snippet in the assertion message, and
@@ -178,6 +187,8 @@ async function log(step, msg) { console.log(`\n[${step}] ${msg}`); }
 /* =====================================================================
  * v20 H2 — RUN STATE: email + order ID tracking
  * ===================================================================== */
+
+let LAST_CONTROLS = { inputs: [], buttons: [] };
 
 const RUN = {
   email: '',            // email actually typed into the signup form
@@ -1025,7 +1036,7 @@ async function fillSnappyCustomWidgets(page, scope, patient, credentials) {
   return filled;
 }
 
-async function fillBasicDetails(scope, patient, credentials) {
+async function fillBasicDetails(scope, patient, credentials, { skip = null } = {}) {
   let filled = 0;
   for (const input of await scope.locator(
     'input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], input:not([type])'
@@ -1043,6 +1054,7 @@ async function fillBasicDetails(scope, patient, credentials) {
     if (meta.value && meta.value.trim()) continue;
 
     const hint = `${meta.name} ${meta.id} ${meta.placeholder} ${meta.label} ${meta.ariaLabel}`.toLowerCase();
+    if (skip && skip.test(hint)) { console.log(`      • Skipped field (${hint.trim().slice(0, 50)})`); continue; }
     let value;
     if (meta.type === 'date') value = `${patient.dobYear}-${patient.dobMonth}-${patient.dobDay}`;
     else if (/first.*name|fname/.test(hint)) value = patient.firstName;
@@ -1867,6 +1879,8 @@ async function logVisibleControls(page, label) {
   console.log(`      🔎 ${label} — visible inputs:`);
   info.inputs.forEach(i => console.log(`         • ${i}`));
   console.log(`      🔎 ${label} — visible buttons: ${info.buttons.join(' | ')}`);
+  LAST_CONTROLS = info;
+  return info;
 }
 
 /** The final "pay / place order" style button, if enabled. */
@@ -1885,6 +1899,93 @@ async function findFinalPayButton(page) {
     }
   }
   return null;
+}
+
+/** v23 K3 — visible validation / error messages on the page. */
+async function collectValidationErrors(page) {
+  return await page.evaluate(() => {
+    const vis = (el) => {
+      const r = el.getBoundingClientRect();
+      const st = window.getComputedStyle(el);
+      return r.width > 0 && r.height > 0 && st.display !== 'none' && st.visibility !== 'hidden';
+    };
+    const sels = '[role="alert"], [class*="error" i], [class*="invalid" i], [class*="danger" i], ' +
+      '[class*="help-block" i], [class*="warning" i], [aria-invalid="true"]';
+    const out = [];
+    document.querySelectorAll(sels).forEach(el => {
+      if (!vis(el)) return;
+      const t = ((el.innerText || el.getAttribute('name') || el.id || '') + '').replace(/\s+/g, ' ').trim().slice(0, 100);
+      if (t && !out.includes(t)) out.push(t);
+    });
+    return out.slice(0, 8);
+  }).catch(() => []);
+}
+async function logValidationErrors(page) {
+  const errs = await collectValidationErrors(page);
+  console.warn(errs.length
+    ? `      ⚠ Visible validation/error text: ${errs.map(e => `"${e}"`).join(' | ')}`
+    : '      • No visible validation/error text');
+  return errs;
+}
+
+/**
+ * v23 K1 — pick a dosage option in the "Dosage Tailored To Your Treatment Plan"
+ * section of the approved-checkout page (the final button stays disabled /
+ * inert until one is chosen). Returns the clicked label, 'already-selected' or null.
+ */
+async function selectDosageIfPresent(page) {
+  const heading = page.getByText(/dosage/i).filter({ visible: true }).first();
+  if (!(await heading.isVisible({ timeout: 500 }).catch(() => false))) return null;
+
+  const picked = await heading.evaluate((h) => {
+    const vis = (el) => {
+      const r = el.getBoundingClientRect();
+      const st = window.getComputedStyle(el);
+      return r.width > 5 && r.height > 5 && st.display !== 'none' && st.visibility !== 'hidden';
+    };
+    const clsOf = (el) => (el && typeof el.className === 'string' ? el.className.toLowerCase() : '');
+    const isSel = (el) => {
+      const near = el.closest('[class*="option" i], [class*="card" i], [class*="dose" i], label');
+      return el.checked === true ||
+        ['aria-checked', 'aria-pressed', 'aria-selected', 'data-selected', 'data-checked']
+          .some(a => el.getAttribute(a) === 'true') ||
+        /(^|[\s_-])(selected|active|checked)/.test(clsOf(el)) ||
+        /(^|[\s_-])(selected|active|checked)/.test(clsOf(near));
+    };
+    const bad = /continue|checkout|submit|cancel|back|next|apply|pay|learn more|details/i;
+    const doseRe = /\d+(\.\d+)?\s*(mg|mcg|ml|units?|iu)\b/i;
+
+    let sec = h;
+    for (let depth = 0; depth < 6 && sec; depth++, sec = sec.parentElement) {
+      const raw = Array.from(sec.querySelectorAll(
+        'input[type="radio"], [role="radio"], [role="option"], .option-card, .custom-radio-circle, ' +
+        '[class*="dose" i], [class*="dosage" i], [class*="option" i], label, button'));
+      const targets = [];
+      for (const el of raw) {
+        const t = el.tagName === 'INPUT' ? (el.closest('label') || el.parentElement) : el;
+        if (!t || targets.some(x => x.t === t)) continue;
+        if (t.contains(h) || h.contains(t) || !vis(t)) continue;
+        const txt = (t.innerText || '').replace(/\s+/g, ' ').trim();
+        if (!txt || txt.length > 120 || bad.test(txt)) continue;
+        targets.push({ t, el, txt });
+      }
+      if (!targets.length) continue;
+      if (targets.some(x => isSel(x.el) || isSel(x.t))) return 'already-selected';
+      const pick = targets.find(x => doseRe.test(x.txt)) || targets[0];
+      pick.t.scrollIntoView({ block: 'center' });
+      pick.t.click();
+      return pick.txt.slice(0, 60);
+    }
+    return null;
+  }).catch(() => null);
+
+  if (picked) {
+    console.log(`      ✓ Dosage: ${picked === 'already-selected' ? 'already selected' : `clicked "${picked}"`}`);
+    if (picked !== 'already-selected') await page.waitForTimeout(500);
+  } else {
+    console.warn('      ⚠ Dosage section found but no selectable option detected');
+  }
+  return picked;
 }
 
 /**
@@ -1940,8 +2041,9 @@ async function completeApprovedCheckout(page, cfg) {
     await confirmAddressPrompts(page);
 
     // 2) card, generic fields, consents, questions
+    await selectDosageIfPresent(page);
     await fillCardIfPresent(page, cfg.payment);
-    await fillBasicDetails(scope, cfg.patient, cfg.credentials);
+    await fillBasicDetails(scope, cfg.patient, cfg.credentials, { skip: /promo|coupon|discount|voucher|referral|gift/i });
     await fillSelects(scope);
     await fillTextareas(scope);
     await checkConsentBoxes(scope);
@@ -1955,6 +2057,7 @@ async function completeApprovedCheckout(page, cfg) {
     if (!btn) {
       idle++;
       console.warn(`      ⚠ No enabled advance button (idle ${idle})`);
+      await logValidationErrors(page);
       await deepBlockerReport(scope);
       await dumpDom(page, `approved-checkout-${step}-blocked`);
       if (idle >= 3) break;
@@ -1977,6 +2080,7 @@ async function completeApprovedCheckout(page, cfg) {
     else {
       idle++;
       console.warn(`      ⚠ No visible progress after "${txt}" (idle ${idle})`);
+      await logValidationErrors(page);
       await dumpDom(page, `approved-checkout-${step}-noprogress`);
       if (idle >= 3) break;
     }
@@ -3072,11 +3176,14 @@ test.describe('Full Order Flow — Homepage to Order Confirmation', () => {
       await dumpDom(page, 'step7-final-state');
     }
     const finalSnippet = (await bodySnippet(page)).slice(0, 300);
+    const finalErrors = orderSucceeded ? [] : await collectValidationErrors(page);
+    const controlsSummary = JSON.stringify({ buttons: LAST_CONTROLS.buttons.slice(0, 12), inputs: LAST_CONTROLS.inputs.slice(0, 10) }).slice(0, 1200);
     expect(
       orderSucceeded,
       `Order not completed. Final URL: ${finalUrl}. ` +
       `approvedCheckout=${JSON.stringify(lastApproved)}; verificationRan=${verificationRan}; ` +
       `verificationAdvanced=${verificationAdvanced}. Page: "${finalSnippet}". ` +
+      `Errors: ${JSON.stringify(finalErrors)}. Controls: ${controlsSummary}. ` +
       `Check test-results/flow-steps/step7-final-state.* and approved-checkout-* dumps.`
     ).toBe(true);
 
