@@ -1,7 +1,45 @@
 // tests/08-full-order-flow.spec.js
 /**
- * Full Order Flow E2E Test (v22)
+ * Full Order Flow E2E Test (v25)
  * ==============================
+ * v25 — SIGNUP STUCK ON /nd-in-qualify?type=qualified (run: signup Submit clicked, page never
+ *   moved to /nd-in-personalize-plan, the loop then clicked "Submit" 27 times and failed with
+ *   "Never reached checkout"). The phone was a fixed value, so a second run re-used a number the
+ *   staging backend already had on an earlier QA account.
+ *   - M1 phone is dynamic: ONLY its last 4 digits are replaced, by the last 4 digits found in the
+ *        email (qa+1793345429665@yopmail.com -> (212) 555-9665). No digits in the email -> the base
+ *        phone is left unchanged. TEST_PHONE (if set) is used as the base format.
+ *   - M2 the phone is printed with the other details (signup log, cancelled-order summaries, final
+ *        summary, cancelled-order.json).
+ *   - M3 if the signup form stays on screen with a phone-related error (already used / exists /
+ *        registered / invalid phone ...), only the last 4 digits are re-rolled (max 3 times),
+ *        the phone field is retyped and the form is submitted again.
+ *   - M4 if signup is still stuck after several sub-steps the visible validation errors are logged,
+ *        the DOM + screenshot are saved and the loop stops (no more blind "Submit" clicks); the
+ *        "Never reached checkout" message carries the signup errors.
+ *
+ * v24 — CANCEL TREATMENT NOT FOUND (run: order placed, landed on /customer/dashboard,
+ *   then STEP 7.5 failed: 'Could not find/click "Cancel Treatment"', final URL /customer/my-account)
+ *   Root cause: the finder only looked for a button/link whose text matched
+ *   /cancel (my) (treatment|order|subscription)/ on 4 pages (dashboard, My Treatments,
+ *   Order History, My Account). It never expanded anything, so a control hidden behind a
+ *   "Manage / View details" button, a kebab (...) menu, an accordion or a tab was invisible,
+ *   and wordings such as "Cancel Plan" / "Cancel Prescription" / an aria-label-only button
+ *   were not matched.
+ *   - L1 CANCEL_TRIGGER_RE widened (plan / prescription / rx / membership / request cancellation),
+ *        plus aria-label/title matches and short leaf-text elements (div/span with cursor:pointer).
+ *   - L2 revealCancelOnPage(): clicks expanders (Manage, View details, kebab/"more" menus,
+ *        accordions, tabs), re-checks for the control after each click, and goes back if the
+ *        click navigated away and nothing was found.
+ *   - L3 findCancelTreatmentControl(): current page -> nav links -> same-origin links crawled from
+ *        the first page -> guessed /customer/... URLs (incl. the harvested order id). 150s budget.
+ *   - L4 diagnostics: every page searched prints its links/buttons and is saved as
+ *        test-results/flow-steps/cancel-search-<n>.html — if it still fails, those files show exactly
+ *        where the control lives.
+ *   - L5 order-history URL guesses now include /customer/... paths; api order-id candidates that
+ *        look like a year (e.g. "2022") are ignored.
+ *   - L6 test timeout raised to 660s to leave room for the search.
+ *
  * v23 — APPROVED-CHECKOUT FIXES (from CI run #8: approvedCheckout advanced=false,
  *   page stuck on "Your Treatment Details" / "Dosage Tailored To Your Treatment Plan"):
  *   - K1 selectDosageIfPresent(): explicitly picks a dosage option in the Dosage section
@@ -11,84 +49,15 @@
  *   - K3 validation errors are logged after every click without progress / no button
  *   - K4 the CI failure message now carries the visible buttons/inputs + validation errors
  *
- * v22.1 — DIAGNOSTICS: when the order is not completed, STEP 7 now logs every
- *   visible input/button, saves step7-final-state.png/.html and puts the
- *   approved-checkout result + a page snippet in the assertion message, and
- *   completeApprovedCheckout() logs the visible controls when it gives up.
- *
- * v22 CHANGES — building on v21:
- *
- *  FIX J1 — verification wizard on the same /approved-secure-checkout URL
- *  ----------------------------------------------------------------------
- *  STEP 6.5 used to test isApprovedCheckoutPage() BEFORE the verification
- *  wizard. If the wizard renders on the same URL, the URL regex kept matching,
- *  completeVerification() never ran and STEP 7 failed with that URL. Now the
- *  wizard is checked first, and an approved-checkout "verification" handoff
- *  runs completeVerification() immediately.
- *
- *  FIX J2 — maximizeBrowser only on headed desktop Chromium
- *  --------------------------------------------------------
- *  The CDP call fails on Firefox, and the fallback resized the viewport to the
- *  screen size, which broke iPhone emulation. It is now skipped on non-Chromium,
- *  mobile projects and CI.
- *
- *  FIX J3 — wait for "Cancel Treatment" before judging the order
- *  -------------------------------------------------------------
- *  cancelAvailable used to be read instantly after the last click. It now waits
- *  up to 8s via waitForCancelTrigger().
- *
- * v21 CHANGES — building on v20:
- *
- *  FIX I1 — delivery address never really got selected
- *  ---------------------------------------------------
- *  The old code used fill() (no key events) so Google-style autocomplete never
- *  opened, then pressed ArrowDown+Enter on an empty list. selectDeliveryAddress():
- *    - types the query slowly with real key events (pressSequentially),
- *    - waits for a suggestion list (.pac-item / listbox options / custom <li>),
- *    - clicks the first suggestion and VERIFIES the field changed,
- *    - retries with fallback queries (CONFIG.payment.addressFallbacks),
- *    - falls back to typing street / city / state / zip by hand,
- *    - clicks "Use this address / Confirm address" prompts if they appear.
- *  The address input is found by role/placeholder/name, so it also works on
- *  any other page that shows it.
- *
- *  FIX I2 — second checkout page (/nd-in-approved-secure-checkout)
- *  ----------------------------------------------------------------
- *  After the first "Complete Checkout" the app now lands on a "Your Treatment
- *  Details" page (dosage, address, etc.). completeApprovedCheckout() handles it
- *  (address -> card fields -> consents/answers -> final button), logs every
- *  visible input/button for debugging, and stops when the order is placed, a
- *  verification wizard appears or "Cancel Treatment" is visible. STEP 6.5 now
- *  loops between this page and the verification wizard.
- *
- * v20 CHANGES — building on v19:
- *
- *  FIX H1 — "app reacts faster / elements missed" (the sub-step 13 failure)
- *  ------------------------------------------------------------------------
- *  After "Continue to see if you qualify" the app now swaps to the signup
- *  form (first/last/email/state/phone) a moment AFTER the loop had already
- *  inspected the page, so the form was never detected and Continue stayed
- *  disabled. Fixes:
- *    - waitForPageSettled(): at the start of every sub-step (and before every
- *      retry pass) wait for network idle, spinners to vanish, at least one
- *      actionable control to exist and the DOM to stop changing.
- *    - handleSignupIfPresent(): the signup form is now checked at the top of
- *      each sub-step AND inside every retry pass (not once-only), so a form
- *      that renders late is still filled and submitted.
- *    - Retry passes (2..5) re-run the text/select/consent fillers too.
- *    - Before the loop gives up, one last settle + signup + fill rescue.
- *
- *  NEW H2 — email + order ID printed after cancelling
- *  --------------------------------------------------
- *  The order ID is harvested from the confirmation URL/page, the API JSON
- *  responses, the cancel page and (best source) the Order History row that
- *  shows "Cancelled". printCancelledOrderSummary() logs the email + order ID
- *  right after the cancellation, again at the end, and saves
- *  test-results/flow-steps/cancelled-order.json.
- *
- *  Everything else (maximize, verification wizard + uploads, plan/checkout,
- *  popup dismissal, semantic questionnaire, Cancel Treatment, Order History
- *  check) is unchanged from v19.
+ * v22.x — J1 verification wizard checked before the approved-checkout page; J2 maximize only on
+ *   headed desktop Chromium; J3 wait for "Cancel Treatment" before judging the order; extra
+ *   diagnostics at STEP 7.
+ * v21 — I1 delivery address selected through real key events + suggestion click (with fallbacks);
+ *   I2 second checkout page (/nd-in-approved-secure-checkout) handled.
+ * v20 — H1 waitForPageSettled + signup form handled on every sub-step; H2 email + order ID printed
+ *   after cancelling.
+ * v19 and earlier — maximize, verification wizard + uploads, plan/checkout, popup dismissal,
+ *   semantic questionnaire, Cancel Treatment, Order History check.
  */
 
 const { test, expect } = require('@playwright/test');
@@ -96,12 +65,44 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
-test.setTimeout(540000);
+test.setTimeout(660000);
+
+/* =====================================================================
+ * v25 M1 — DYNAMIC PHONE: only the LAST 4 DIGITS change, taken from the
+ *          digits found in the email. Everything else stays as formatted.
+ * ===================================================================== */
+
+/** Replace the last 4 digit characters of `phone` with `last4`, keeping the formatting. */
+function withLast4(phone, last4) {
+  const chars = String(phone).split('');
+  let k = 3;
+  for (let i = chars.length - 1; i >= 0 && k >= 0; i--) {
+    if (/\d/.test(chars[i])) { chars[i] = last4[k]; k--; }
+  }
+  return chars.join('');
+}
+
+/**
+ * basePhone "(212) 555-4321" + email "qa+1793345429665@yopmail.com" -> "(212) 555-9665".
+ * No digits in the email -> basePhone unchanged. Fewer than 4 digits -> the missing leading
+ * positions keep the base phone's own digits.
+ */
+function dynamicPhone(basePhone, email) {
+  const baseDigits = String(basePhone).replace(/\D/g, '');
+  const emailDigits = String(email || '').replace(/\D/g, '');
+  if (!emailDigits || baseDigits.length < 4) return basePhone;
+  const keep = baseDigits.slice(-4).slice(0, Math.max(0, 4 - emailDigits.length));
+  const last4 = (keep + emailDigits).slice(-4);
+  return withLast4(basePhone, last4);
+}
+
+const BASE_EMAIL = process.env.TEST_EMAIL || `qa+${Date.now()}@yopmail.com`;
+const BASE_PHONE = process.env.TEST_PHONE || '(212) 555-4321';
 
 const CONFIG = {
   baseUrl: process.env.TEST_BASE_URL || 'https://staging.snappyscripts.com',
   credentials: {
-    email: process.env.TEST_EMAIL || `qa+${Date.now()}@yopmail.com`,
+    email: BASE_EMAIL,
     password: process.env.TEST_PASSWORD || 'TestPass123!',
   },
   patient: {
@@ -111,7 +112,7 @@ const CONFIG = {
     dobMonth: process.env.TEST_DOB_MONTH || '10',
     dobDay: process.env.TEST_DOB_DAY || '10',
     dobYear: process.env.TEST_DOB_YEAR || '1997',
-    phone: process.env.TEST_PHONE || '(212) 555-1234',
+    phone: dynamicPhone(BASE_PHONE, BASE_EMAIL), // v25 M1: last 4 digits come from the email
     address: process.env.TEST_ADDRESS || '123 Test St',
     city: process.env.TEST_CITY || 'Testville',
     state: process.env.TEST_STATE || 'IA',
@@ -192,6 +193,7 @@ let LAST_CONTROLS = { inputs: [], buttons: [] };
 
 const RUN = {
   email: '',            // email actually typed into the signup form
+  phone: '',            // phone actually typed into the signup form (v25)
   orderIds: [],         // [{ id, source, priority }]
   cancelled: false,
 };
@@ -232,6 +234,8 @@ function extractOrderId(text, url = '') {
 
 function recordOrderId(id, source) {
   if (!id) return;
+  // v24 L5: a bare year ("2022") from an API payload is not an order id
+  if (source === 'api' && /^(19|20)\d{2}$/.test(String(id))) return;
   if (RUN.orderIds.some(o => o.id === id && o.source === source)) return;
   RUN.orderIds.push({ id, source, priority: ORDER_SOURCE_PRIORITY[source] || 0 });
   console.log(`      🧾 Order ID candidate "${id}" (source: ${source})`);
@@ -254,6 +258,18 @@ function currentEmail() {
   return RUN.email || CONFIG.credentials.email;
 }
 
+function currentPhone() {
+  return RUN.phone || CONFIG.patient.phone;
+}
+
+/** v25 M3: re-roll ONLY the last 4 digits of the phone (used when signup rejects the number). */
+function rotatePhoneLast4() {
+  const last4 = String(Date.now()).slice(-4);
+  CONFIG.patient.phone = withLast4(CONFIG.patient.phone, last4);
+  RUN.phone = CONFIG.patient.phone;
+  return CONFIG.patient.phone;
+}
+
 function printCancelledOrderSummary(label) {
   const best = bestOrderId();
   const email = currentEmail();
@@ -262,6 +278,7 @@ function printCancelledOrderSummary(label) {
   console.log(` 🛑 ${label}`);
   console.log(`${line}`);
   console.log(` 📧 Email ID : ${email}`);
+  console.log(` 📱 Phone    : ${currentPhone()}`);
   console.log(` 🧾 Order ID : ${best ? best.id : 'NOT FOUND (see order-history / cancel-treatment artifacts)'}`);
   if (best) console.log(`    (source: ${best.source})`);
   if (RUN.orderIds.length > 1) {
@@ -274,6 +291,7 @@ function printCancelledOrderSummary(label) {
       path.join(SHOTS_DIR, 'cancelled-order.json'),
       JSON.stringify({
         email,
+        phone: currentPhone(),
         orderId: best ? best.id : null,
         orderIdSource: best ? best.source : null,
         candidates: RUN.orderIds,
@@ -1555,6 +1573,15 @@ async function fillSignupForm(page, patient, credentials) {
     console.log(`      📧 Signup email in use: ${RUN.email}`);
   }
 
+  // v25 M2: remember + print the phone that is really in the form
+  const typedPhone = await page
+    .locator('input[name="phone"], input[type="tel"], input[placeholder*="Phone" i], input[id*="phone" i]')
+    .filter({ visible: true }).first().inputValue().catch(() => '');
+  if (typedPhone && typedPhone.trim()) {
+    RUN.phone = typedPhone.trim();
+    console.log(`      📱 Signup phone in use: ${RUN.phone}`);
+  }
+
   await dismissOverlays(page);
 
   const submit = page.locator('button:has-text("Submit"), button[type="submit"]').filter({ visible: true }).first();
@@ -1600,12 +1627,54 @@ async function signupHasEmptyFields(page) {
   }).catch(() => false);
 }
 
+// v25 M3: signup errors that mean "this phone number cannot be used"
+const PHONE_ERR_RE = /phone|mobile|already|exist|registered|duplicate|taken|in use/i;
+
+/**
+ * v25 M3 — the signup form is still on screen after Submit with a phone-related error:
+ * re-roll ONLY the last 4 digits, retype the phone field and submit again.
+ */
+async function retrySignupWithNewPhone(page, state, errs) {
+  state.phoneRetries = (state.phoneRetries || 0) + 1;
+  const oldPhone = currentPhone();
+  const newPhone = rotatePhoneLast4();
+  console.warn(`      ⚠ Signup errors: ${errs.map(e => `"${e}"`).join(' | ')}`);
+  console.log(`      📱 Phone retry ${state.phoneRetries}/3: ${oldPhone} → ${newPhone} (last 4 digits only)`);
+
+  const ph = page.locator('input[name="phone"], input[type="tel"], input[placeholder*="Phone" i], input[id*="phone" i]')
+    .filter({ visible: true }).first();
+  if (!(await ph.isVisible({ timeout: 800 }).catch(() => false))) return false;
+  await ph.scrollIntoViewIfNeeded({ timeout: 800 }).catch(() => {});
+  await ph.click({ timeout: 1000 }).catch(() => {});
+  await ph.press('Control+A').catch(() => {});
+  await ph.press('Backspace').catch(() => {});
+  await ph.fill('').catch(() => {});
+  await ph.type(newPhone, { delay: 30 }).catch(() => {});
+  console.log(`      📱 Signup phone in use: ${(await ph.inputValue().catch(() => '')) || newPhone}`);
+
+  const submit = page.locator('button:has-text("Submit"), button[type="submit"]').filter({ visible: true }).first();
+  if (await submit.isVisible({ timeout: 1500 }).catch(() => false)) {
+    await submit.scrollIntoViewIfNeeded({ timeout: 800 }).catch(() => {});
+    await submit.click({ timeout: 3000 }).catch(() => {});
+    console.log('      ✓ Clicked signup Submit (phone retry)');
+    await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+    await page.waitForTimeout(2500);
+  }
+  return true;
+}
+
 /** Returns true if it filled/submitted the signup form on this call. */
 async function handleSignupIfPresent(page, patient, credentials, state) {
   if (state.attempts >= 5) return false;
   if (!(await isSignupFormVisible(page))) return false;
   const empty = await signupHasEmptyFields(page);
-  if (state.attempts > 0 && !empty) return false; // already filled & submitted, nothing new to do
+  if (state.attempts > 0 && !empty) {
+    // already filled & submitted — but is the form still here because of a phone-related error?
+    if ((state.phoneRetries || 0) >= 3) return false;
+    const errs = await collectValidationErrors(page);
+    if (!errs.some(e => PHONE_ERR_RE.test(e))) return false;
+    return await retrySignupWithNewPhone(page, state, errs);
+  }
   state.attempts++;
   console.log(`   ✓ Signup form detected (attempt ${state.attempts}) — filling it`);
   await fillSignupForm(page, patient, credentials);
@@ -2377,19 +2446,37 @@ async function completeVerification(page, patient, images) {
 }
 
 /* =====================================================================
- * v19 FIX G1 — CANCEL TREATMENT AFTER A SUCCESSFUL ORDER
+ * v19 FIX G1 + v24 FIX L1-L4 — CANCEL TREATMENT AFTER A SUCCESSFUL ORDER
  * ===================================================================== */
 
-const CANCEL_TRIGGER_RE = /cancel\s*(my\s*)?(treatment|order|subscription)/i;
+// v24 L1: wider wording (plan / prescription / rx / membership / "request cancellation")
+const CANCEL_TRIGGER_RE = /cancel\s*(my\s*|your\s*|the\s*)?(treatment|order|subscription|plan|prescription|rx|membership)s?\b|request\s+(a\s+)?cancell?ation|(stop|end)\s+(my\s+)?(treatment|subscription)/i;
+// a non-button element (div/span/li…) is only trusted when its WHOLE text is the cancel label
+const CANCEL_LEAF_RE = /^\s*cancel\s*(my\s*|your\s*|the\s*)?(treatment|order|subscription|plan|prescription|rx|membership)\s*$/i;
 const CANCELLED_TEXT_RE = /(treatment|order|subscription)[^.]{0,60}cancel(l)?ed|cancel(l)?ed\s+(successfully|your)|has been cancel(l)?ed|cancellation\s+(confirmed|complete|successful|requested)/i;
 
-/** Visible "Cancel Treatment" style buttons/links on the current page. */
+// never click these while hunting for the control
+const SKIP_NAV_RE = /log\s*-?out|sign\s*-?out|logout|signout|\bcart\b|checkout|contact|support|\bhelp\b|faq|blog|privacy|terms|instagram|facebook|twitter|linkedin|mailto:|tel:|\/shop|refer|gift/i;
+// links worth crawling for the control
+const INTERESTING_LINK_RE = /treat|order|subscri|prescri|\brx\b|plan|account|manage|billing|medic|profile|dashboard|customer/i;
+// buttons that usually reveal order/treatment actions
+const EXPANDER_TEXT_RE = /^(manage|view|details?|view details?|treatment details?|order details?|view order|view treatment|view plan|manage (treatment|plan|subscription|order)|more|options|actions|see (more|details)|show (more|details)|expand|settings|⋮|…|\.\.\.)\b/i;
+
+/** Visible "Cancel Treatment" style controls on the current page. */
 function cancelTriggers(page) {
-  const all = page
-    .locator('button, a, [role="button"], [role="link"], input[type="button"], input[type="submit"]')
-    .filter({ hasText: CANCEL_TRIGGER_RE })
-    .filter({ visible: true });
-  return all;
+  const interactive = page
+    .locator('button, a, [role="button"], [role="link"], [role="menuitem"], input[type="button"], input[type="submit"]')
+    .filter({ hasText: CANCEL_TRIGGER_RE });
+  const byAttr = page.locator(
+    '[aria-label*="cancel treatment" i], [aria-label*="cancel order" i], [aria-label*="cancel subscription" i], [aria-label*="cancel plan" i], ' +
+    '[title*="cancel treatment" i], [title*="cancel order" i], [title*="cancel subscription" i], [title*="cancel plan" i], ' +
+    '[data-testid*="cancel-treatment" i], [data-testid*="cancel-order" i], [id*="cancel-treatment" i], [id*="cancel-order" i]'
+  );
+  const leaf = page
+    .locator('div, span, li, p, label, td, h3, h4, h5, h6')
+    .filter({ hasText: CANCEL_LEAF_RE })
+    .filter({ hasNot: page.locator('*') });
+  return interactive.or(byAttr).or(leaf).filter({ visible: true });
 }
 
 /** Wait up to timeoutMs for a cancel trigger; prefers "Cancel Treatment". */
@@ -2418,28 +2505,184 @@ async function openPossibleMenus(page) {
   }
 }
 
-/**
- * Find the Cancel Treatment control: current page first, then by browsing
- * through My Treatments / My Orders / Account style links.
- */
-async function findCancelTreatmentControl(page) {
-  let trigger = await waitForCancelTrigger(page, 6000);
-  if (trigger) return trigger;
+/** v24 L4: print every visible link + button so a failed run shows where to look. */
+async function logPageNav(page, label) {
+  const info = await page.evaluate(() => {
+    const vis = (el) => {
+      const r = el.getBoundingClientRect();
+      const st = window.getComputedStyle(el);
+      return r.width > 0 && r.height > 0 && st.display !== 'none' && st.visibility !== 'hidden';
+    };
+    const links = Array.from(document.querySelectorAll('a[href]')).filter(vis).map(a =>
+      `${(a.innerText || a.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim().slice(0, 35)} → ${a.getAttribute('href')}`);
+    const buttons = Array.from(document.querySelectorAll('button,[role="button"],[role="tab"],summary')).filter(vis).map(e =>
+      `${(e.innerText || e.getAttribute('aria-label') || e.getAttribute('title') || '').replace(/\s+/g, ' ').trim().slice(0, 35)}${e.disabled ? ' (disabled)' : ''}`);
+    return { links: Array.from(new Set(links)).slice(0, 30), buttons: Array.from(new Set(buttons)).slice(0, 30) };
+  }).catch(() => ({ links: [], buttons: [] }));
+  console.log(`      🔎 [${label}] ${page.url()}`);
+  console.log(`         links:   ${info.links.join(' | ') || '(none)'}`);
+  console.log(`         buttons: ${info.buttons.join(' | ') || '(none)'}`);
+  return info;
+}
 
-  const navHints = [
-    /my\s*treatments?/i,
-    /my\s*orders?/i,
-    /order\s*history/i,
-    /^orders?$/i,
-    /my\s*account/i,
-    /^account$/i,
-    /dashboard/i,
-    /my\s*subscriptions?/i,
-    /^profile$/i,
-  ];
-  for (const re of navHints) {
+async function describeEl(el) {
+  return await el.evaluate(e => ({
+    tag: e.tagName.toLowerCase(),
+    text: ((e.innerText || e.getAttribute('aria-label') || e.getAttribute('title') || '') + '').replace(/\s+/g, ' ').trim().slice(0, 50),
+    href: e.getAttribute('href') || '',
+    cls: (typeof e.className === 'string' ? e.className : '').slice(0, 40),
+  })).catch(() => null);
+}
+
+/**
+ * v24 L2 — the control is often hidden behind "Manage" / "View details", a kebab
+ * (...) menu, an accordion or a tab. Click such expanders one by one, re-checking
+ * for the cancel control after each click; go back if a click navigated away.
+ */
+async function revealCancelOnPage(page, label, deadline) {
+  let t = await waitForCancelTrigger(page, 1500);
+  if (t) return t;
+
+  const candidates = () => page.locator(
+    '[aria-expanded="false"], summary, [role="tab"], [aria-haspopup="menu"], [aria-haspopup="true"], ' +
+    '[data-bs-toggle], [data-toggle="collapse"], [data-toggle="dropdown"], ' +
+    '[aria-label*="more" i], [aria-label*="menu" i], [aria-label*="options" i], [aria-label*="actions" i], ' +
+    '[class*="kebab" i], [class*="ellipsis" i], [class*="dropdown-toggle" i], ' +
+    '[class*="accordion" i] > button, [class*="accordion" i] [class*="header" i]'
+  ).or(
+    page.locator('button, a, [role="button"], [role="tab"]').filter({ hasText: EXPANDER_TEXT_RE })
+  ).filter({ visible: true });
+
+  const host = (() => { try { return new URL(page.url()).host; } catch { return ''; } })();
+  const tried = new Set();
+
+  for (let iter = 0; iter < 12 && Date.now() < deadline; iter++) {
+    const cands = candidates();
+    const n = Math.min(await cands.count().catch(() => 0), 40);
+    let target = null;
+    let key = null;
+    for (let i = 0; i < n; i++) {
+      const el = cands.nth(i);
+      const d = await describeEl(el);
+      if (!d) continue;
+      const k = `${d.tag}|${d.text}|${d.href}|${d.cls}`;
+      if (tried.has(k)) continue;
+      if (SKIP_NAV_RE.test(`${d.text} ${d.href}`)) { tried.add(k); continue; }
+      if (/^https?:/i.test(d.href) && host && !d.href.includes(host)) { tried.add(k); continue; }
+      target = el; key = k;
+      break;
+    }
+    if (!target) break;
+    tried.add(key);
+
+    const urlBefore = page.url();
+    await target.scrollIntoViewIfNeeded({ timeout: 1000 }).catch(() => {});
+    const ok = await target.click({ timeout: 2500 }).then(() => true).catch(() => false);
+    if (!ok) continue;
+    await page.waitForLoadState('domcontentloaded', { timeout: 4000 }).catch(() => {});
+    await page.waitForTimeout(700);
+
+    t = await waitForCancelTrigger(page, 1500);
+    if (t) {
+      console.log(`      ✓ Cancel control revealed by clicking "${key}" on ${label}`);
+      return t;
+    }
+    if (page.url() !== urlBefore) {
+      await waitForPageSettled(page, { timeout: 3000 });
+      t = await waitForCancelTrigger(page, 2000);
+      if (t) {
+        console.log(`      ✓ Cancel control found on ${page.url()} (after clicking "${key}")`);
+        return t;
+      }
+      await page.goBack({ waitUntil: 'domcontentloaded', timeout: 8000 }).catch(() => {});
+      await waitForPageSettled(page, { timeout: 3000 });
+    } else {
+      await page.keyboard.press('Escape').catch(() => {});
+    }
+  }
+  return null;
+}
+
+/** Same-origin links on the current page that could lead to the treatment/order. */
+async function collectInterestingLinks(page) {
+  const host = (() => { try { return new URL(page.url()).host; } catch { return ''; } })();
+  const raw = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('a[href]')).map(a => ({
+      href: a.href,
+      text: (a.innerText || a.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim().slice(0, 40),
+    }))
+  ).catch(() => []);
+  const seen = new Set();
+  const out = [];
+  for (const l of raw) {
+    if (!l.href || !/^https?:/i.test(l.href)) continue;
+    let u;
+    try { u = new URL(l.href); } catch { continue; }
+    if (u.host !== host) continue;
+    const key = u.origin + u.pathname;
+    if (seen.has(key)) continue;
+    const hay = `${l.text} ${u.pathname}`;
+    if (SKIP_NAV_RE.test(hay) || !INTERESTING_LINK_RE.test(hay)) continue;
+    seen.add(key);
+    out.push(l.href);
+  }
+  return out.slice(0, 12);
+}
+
+const CANCEL_NAV_HINTS = [
+  /my\s*treatments?/i,
+  /^treatments?$/i,
+  /my\s*orders?/i,
+  /order\s*history/i,
+  /^orders?$/i,
+  /my\s*subscriptions?/i,
+  /^subscriptions?$/i,
+  /billing/i,
+  /my\s*account/i,
+  /^account$/i,
+  /dashboard/i,
+  /^profile$/i,
+];
+
+/**
+ * v24 L3 — find the Cancel Treatment control:
+ *   1) current page (+ expanders), 2) nav links by text, 3) same-origin links crawled from the
+ *   first page, 4) guessed /customer/... URLs (incl. the harvested order id).
+ * Total budget 150s. Every page searched is logged and dumped (cancel-search-<n>.html).
+ */
+async function findCancelTreatmentControl(page, baseUrl) {
+  const deadline = Date.now() + 150000;
+  const left = () => Date.now() < deadline;
+  const visited = new Set();
+  let pageNo = 0;
+
+  await dismissOverlays(page);
+  const startLinks = await collectInterestingLinks(page);
+
+  const inspect = async (label) => {
+    const key = page.url().split('#')[0];
+    if (visited.has(key)) return null;
+    visited.add(key);
+    pageNo++;
+    await waitForPageSettled(page, { timeout: 5000 });
+    console.log(`      🔍 Looking for Cancel Treatment on ${label}: ${page.url()}`);
+    const direct = await waitForCancelTrigger(page, 2500);
+    if (direct) return direct;
+    await logPageNav(page, label);
+    await dumpDom(page, `cancel-search-${pageNo}`);
+    await snapshot(page, `cancel-search-${pageNo}`);
+    return await revealCancelOnPage(page, label, deadline);
+  };
+
+  // 1) where we are now
+  let t = await inspect('current page');
+  if (t) return t;
+
+  // 2) nav links by text
+  for (const re of CANCEL_NAV_HINTS) {
+    if (!left()) break;
     const link = page
-      .locator('a, button, [role="link"], [role="button"], [role="tab"]')
+      .locator('a, button, [role="link"], [role="button"], [role="tab"], [role="menuitem"]')
       .filter({ hasText: re })
       .filter({ visible: true })
       .first();
@@ -2449,11 +2692,39 @@ async function findCancelTreatmentControl(page) {
     await link.scrollIntoViewIfNeeded({ timeout: 1000 }).catch(() => {});
     await link.click({ timeout: 3000 }).catch(() => {});
     await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
-    await page.waitForTimeout(1000);
-
-    trigger = await waitForCancelTrigger(page, 4000);
-    if (trigger) return trigger;
+    await page.waitForTimeout(800);
+    t = await inspect(`nav "${re.source}"`);
+    if (t) return t;
   }
+
+  // 3) links crawled from the first page
+  for (const href of startLinks) {
+    if (!left()) break;
+    if (visited.has(href.split('#')[0])) continue;
+    console.log(`      → Visiting ${href}`);
+    const resp = await page.goto(href, { waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => null);
+    if (!resp || resp.status() >= 400) continue;
+    t = await inspect(`link ${new URL(href).pathname}`);
+    if (t) return t;
+  }
+
+  // 4) guessed URLs
+  const best = bestOrderId();
+  const guesses = [
+    '/customer/my-treatments', '/customer/treatments', '/customer/my-orders', '/customer/orders',
+    '/customer/order-history', '/customer/subscriptions', '/customer/my-account',
+    ...(best ? [`/customer/orders/${best.id}`, `/customer/order/${best.id}`, `/customer/treatments/${best.id}`] : []),
+  ];
+  for (const p of guesses) {
+    if (!left()) break;
+    const resp = await page.goto(`${baseUrl}${p}`, { waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => null);
+    if (!resp || resp.status() >= 400) continue;
+    if (/login|sign-?in/i.test(page.url())) continue;
+    t = await inspect(`guess ${p}`);
+    if (t) return t;
+  }
+
+  console.warn(`      ⚠ Cancel Treatment not found after searching ${visited.size} page(s): ${Array.from(visited).join(' , ')}`);
   return null;
 }
 
@@ -2467,10 +2738,10 @@ async function findCancelTreatmentControl(page) {
  * v20: also harvests the order ID from the page before/after cancelling.
  * Returns { clicked, confirmed, cancelled }.
  */
-async function cancelTreatment(page) {
+async function cancelTreatment(page, baseUrl) {
   const result = { clicked: false, confirmed: false, cancelled: false };
 
-  const trigger = await findCancelTreatmentControl(page);
+  const trigger = await findCancelTreatmentControl(page, baseUrl);
   if (!trigger) {
     console.warn('      ⚠ No "Cancel Treatment" control found');
     await snapshot(page, 'cancel-treatment-not-found');
@@ -2500,7 +2771,7 @@ async function cancelTreatment(page) {
   await captureOrderIdFromPage(page, 'cancel-page');
 
   const noRe = /keep|don'?t|do not|go back|^no\b|never\s*mind|not now|close|back$/i;
-  const confirmRe = /^(yes\b.*|confirm.*|proceed.*|submit.*|continue.*|cancel\s*(my\s*)?(treatment|order|subscription).*|cancel now|cancel$|okay|ok)$/i;
+  const confirmRe = /^(yes\b.*|confirm.*|proceed.*|submit.*|continue.*|cancel\s*(my\s*)?(treatment|order|subscription|plan|prescription).*|cancel now|cancel$|okay|ok)$/i;
 
   for (let round = 1; round <= 4; round++) {
     // If the page already shows a cancelled message, we are done.
@@ -2611,11 +2882,14 @@ const ORDER_HISTORY_LINK_RES = [
 const ORDER_HISTORY_PATHS = [
   '/order-history', '/orders', '/my-orders', '/account/orders',
   '/account/order-history', '/nd-in-order-history', '/dashboard/orders',
+  // v24 L5: this app keeps the signed-in area under /customer
+  '/customer/order-history', '/customer/orders', '/customer/my-orders',
+  '/customer/my-treatments', '/customer/treatments',
 ];
 
 /** Does the current page look like an order-history listing? */
 async function looksLikeOrderHistory(page) {
-  if (/order[-_]?history|my[-_]?orders|\/orders/i.test(page.url())) return true;
+  if (/order[-_]?history|my[-_]?orders|\/orders|customer\/(orders?|treatments?|my-treatments)/i.test(page.url())) return true;
   return await page.getByText(/order history|my orders|past orders|order #|order id/i)
     .filter({ visible: true }).first().isVisible({ timeout: 800 }).catch(() => false);
 }
@@ -2850,7 +3124,10 @@ test.describe('Full Order Flow — Homepage to Order Confirmation', () => {
     let stepCount = 0;
     let reachedCheckout = false;
     let stallCount = 0;
-    const signupState = { attempts: 0 };
+    const signupState = { attempts: 0, phoneRetries: 0, stuck: 0 };
+    let lastSignupErrors = [];
+    console.log(`   📧 Email for this run: ${currentEmail()}`);
+    console.log(`   📱 Phone for this run: ${currentPhone()}`);
 
     subStepLoop:
     while (stepCount < MAX_STEPS) {
@@ -2883,6 +3160,26 @@ test.describe('Full Order Flow — Homepage to Order Confirmation', () => {
       if (await handleSignupIfPresent(page, CONFIG.patient, CONFIG.credentials, signupState)) {
         await snapshot(page, `signup-form-${stepCount}`);
         continue;
+      }
+
+      // v25 M4 — signup was submitted but we are still on the qualified step: stop
+      // blind "Submit" clicking, show why, and give up after a few sub-steps.
+      if (signupState.attempts > 0 && /type=qualified/i.test(urlBefore)) {
+        signupState.stuck++;
+        if (signupState.stuck >= 3) {
+          lastSignupErrors = await collectValidationErrors(page);
+          if (signupState.stuck === 3) {
+            console.warn(`      ⚠ Still on the signup/qualified step after submit (${signupState.stuck}). ` +
+              `Phone=${currentPhone()} Email=${currentEmail()}`);
+            await logValidationErrors(page);
+            await snapshot(page, 'signup-stuck');
+            await dumpDom(page, 'signup-stuck');
+          }
+        }
+        if (signupState.stuck > 8) {
+          console.warn('      ⚠ Signup never moved on — stopping the questionnaire loop');
+          break;
+        }
       }
 
       await page.waitForTimeout(400);
@@ -3041,7 +3338,9 @@ test.describe('Full Order Flow — Homepage to Order Confirmation', () => {
     expect(
       onCheckout || reachedCheckout,
       `Never reached checkout. Final URL: ${page.url()}. Loop ran ${stepCount} sub-step(s). ` +
-      `See test-results/flow-steps/`
+      `Email=${currentEmail()} Phone=${currentPhone()} phoneRetries=${signupState.phoneRetries}. ` +
+      `Signup errors: ${JSON.stringify(lastSignupErrors)}. ` +
+      `See test-results/flow-steps/ (signup-stuck.html / final-not-checkout.html)`
     ).toBe(true);
 
     let cardFilled = false;
@@ -3187,9 +3486,9 @@ test.describe('Full Order Flow — Homepage to Order Confirmation', () => {
       `Check test-results/flow-steps/step7-final-state.* and approved-checkout-* dumps.`
     ).toBe(true);
 
-    // STEP 7.5 — CANCEL TREATMENT (v19 FIX G1)
+    // STEP 7.5 — CANCEL TREATMENT (v19 FIX G1, v24 broader search)
     await log('STEP 7.5', 'Clicking Cancel Treatment and completing the cancellation...');
-    const cancel = await cancelTreatment(page);
+    const cancel = await cancelTreatment(page, CONFIG.baseUrl);
     RUN.cancelled = cancel.cancelled;
     if (cancel.cancelled) {
       console.log('   ✅ Cancellation message detected');
@@ -3203,7 +3502,7 @@ test.describe('Full Order Flow — Homepage to Order Confirmation', () => {
     expect(
       cancel.clicked,
       `Could not find/click "Cancel Treatment". Final URL: ${page.url()}. ` +
-      `See test-results/flow-steps/*cancel-treatment-* screenshots/DOM dumps.`
+      `See test-results/flow-steps/cancel-search-*.html (every page searched) and *cancel-treatment-* screenshots/DOM dumps.`
     ).toBe(true);
 
     // STEP 7.6 — VERIFY "CANCELLED" IN ORDER HISTORY (v19 FIX G2)
@@ -3241,6 +3540,7 @@ test.describe('Full Order Flow — Homepage to Order Confirmation', () => {
     console.log('\n═══════════════════════════════════════════════');
     console.log(' ✅ ORDER PLACED, TREATMENT CANCELLED, ORDER HISTORY SHOWS CANCELLED');
     console.log(` 📧 Email ID : ${currentEmail()}`);
+    console.log(` 📱 Phone    : ${currentPhone()}`);
     console.log(` 🧾 Order ID : ${finalBest ? finalBest.id : 'NOT FOUND'}`);
     console.log('═══════════════════════════════════════════════\n');
   });

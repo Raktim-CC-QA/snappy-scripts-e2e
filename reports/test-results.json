@@ -255,7 +255,7 @@
         {
           "title": "Full Order Flow — Homepage to Order Confirmation",
           "file": "08-full-order-flow.spec.js",
-          "line": 2640,
+          "line": 3027,
           "column": 6,
           "specs": [
             {
@@ -264,13 +264,13 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 540000,
+                  "timeout": 660000,
                   "annotations": [
                     {
                       "type": "serial",
                       "location": {
                         "file": "D:\\Projects\\Snappy\\snappy-scripts-e2e\\tests\\08-full-order-flow.spec.js",
-                        "line": 2640,
+                        "line": 3027,
                         "column": 6
                       }
                     }
@@ -283,7 +283,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 312653,
+                      "duration": 268627,
                       "errors": [],
                       "stdout": [
                         {
@@ -330,6 +330,12 @@
                         },
                         {
                           "text": "\n[STEP 4] Filling questionnaire (semantic-intent)...\n"
+                        },
+                        {
+                          "text": "   📧 Email for this run: qa+1793346474575@yopmail.com\n"
+                        },
+                        {
+                          "text": "   📱 Phone for this run: (212) 555-4575\n"
                         },
                         {
                           "text": "   → Sub-step 1: https://staging.snappyscripts.com/nd-in-qualify?type=start\n"
@@ -548,7 +554,10 @@
                           "text": "      ✓ All required fields verified populated\n"
                         },
                         {
-                          "text": "      📧 Signup email in use: qa+1791443908702@yopmail.com\n"
+                          "text": "      📧 Signup email in use: qa+1793346474575@yopmail.com\n"
+                        },
+                        {
+                          "text": "      📱 Signup phone in use: (212) 555-4575\n"
                         },
                         {
                           "text": "      ✓ Clicked signup Submit\n"
@@ -575,16 +584,28 @@
                           "text": "   • Address attempt 1: typed \"test\"\n"
                         },
                         {
+                          "text": "   ⚠ No suggestion list visible — used ArrowDown+Enter\n"
+                        },
+                        {
+                          "text": "   • Address attempt 2: typed \"6202 E Test Dr\"\n"
+                        },
+                        {
                           "text": "   ✓ Picked address suggestion \"6202 E Test Dr Mesa, AZ 85206\"\n"
                         },
                         {
-                          "text": "   ✓ Delivery address selected via suggestion: \"6202 E Test Dr\"\n"
+                          "text": "   • Address attempt 3: typed \"6202 E Test Dr Mesa AZ\"\n"
+                        },
+                        {
+                          "text": "   ✓ Picked address suggestion \"6202 E Test Dr Mesa, AZ 85206\"\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\12-address-manual-fallback.png\n"
                         },
                         {
                           "text": "   ✓ Filled card details\n"
                         },
                         {
-                          "text": "   📸 test-results\\flow-steps\\12-checkout-filled.png\n"
+                          "text": "   📸 test-results\\flow-steps\\13-checkout-filled.png\n"
                         },
                         {
                           "text": "\n[STEP 6] Submitting order...\n"
@@ -593,7 +614,7 @@
                           "text": "   ✓ Clicked pay/submit button → URL now https://staging.snappyscripts.com/nd-in-complete-verification\n"
                         },
                         {
-                          "text": "   📸 test-results\\flow-steps\\13-after-submit.png\n"
+                          "text": "   📸 test-results\\flow-steps\\14-after-submit.png\n"
                         },
                         {
                           "text": "\n[STEP 6.5] Handling post-checkout verification + image uploads...\n"
@@ -608,7 +629,7 @@
                           "text": "      📎 Uploaded selfie → file input #0\n"
                         },
                         {
-                          "text": "   📸 test-results\\flow-steps\\14-verify-step-1.png\n"
+                          "text": "   📸 test-results\\flow-steps\\15-verify-step-1.png\n"
                         },
                         {
                           "text": "      ✓ Clicked verification advance: \"Continue to Next Step\"\n"
@@ -617,13 +638,10 @@
                           "text": "   → Dismissed overlay: button:has-text(\"No, thanks\")\n"
                         },
                         {
-                          "text": "   → Dismissed overlay (text=\"No, Thanks\")\n"
-                        },
-                        {
                           "text": "   → Verify sub-step 2: https://staging.snappyscripts.com/customer/dashboard\n"
                         },
                         {
-                          "text": "   📸 test-results\\flow-steps\\15-verify-step-2.png\n"
+                          "text": "   📸 test-results\\flow-steps\\16-verify-step-2.png\n"
                         },
                         {
                           "text": "      ⚠ No enabled Continue/Submit on verify step 2\n"
@@ -635,7 +653,7 @@
                           "text": "   → Verify sub-step 3: https://staging.snappyscripts.com/customer/dashboard\n"
                         },
                         {
-                          "text": "   📸 test-results\\flow-steps\\16-verify-step-3.png\n"
+                          "text": "   📸 test-results\\flow-steps\\17-verify-step-3.png\n"
                         },
                         {
                           "text": "      ⚠ No enabled Continue/Submit on verify step 3\n"
@@ -644,7 +662,7 @@
                           "text": "   🧾 DOM dumped: test-results\\flow-steps\\verify-step-3-blocked.html\n"
                         },
                         {
-                          "text": "   📸 test-results\\flow-steps\\17-after-verification.png\n"
+                          "text": "   📸 test-results\\flow-steps\\18-after-verification.png\n"
                         },
                         {
                           "text": "   • No further checkout/verification page detected (url=https://staging.snappyscripts.com/customer/dashboard)\n"
@@ -656,37 +674,145 @@
                           "text": "   ✓ Final URL: https://staging.snappyscripts.com/customer/dashboard\n"
                         },
                         {
-                          "text": "      🧾 Order ID candidate \"95ED1E5C37\" (source: confirmation)\n"
+                          "text": "      🧾 Order ID candidate \"96E0059DEB\" (source: confirmation)\n"
                         },
                         {
-                          "text": "   ✅ Confirmation detected — Order ID: 95ED1E5C37\n"
-                        },
-                        {
-                          "text": "   ✅ \"Cancel Treatment\" control visible — order is placed\n"
+                          "text": "   ✅ Confirmation detected — Order ID: 96E0059DEB\n"
                         },
                         {
                           "text": "\n[STEP 7.5] Clicking Cancel Treatment and completing the cancellation...\n"
                         },
                         {
-                          "text": "      🧾 Order ID candidate \"95ED1E5C37\" (source: cancel-page)\n"
+                          "text": "      🔍 Looking for Cancel Treatment on current page: https://staging.snappyscripts.com/customer/dashboard\n"
+                        },
+                        {
+                          "text": "      🔎 [current page] https://staging.snappyscripts.com/customer/dashboard\n"
+                        },
+                        {
+                          "text": "         links:    → https://staging.snappyscripts.com | MY TREATMENTS → https://staging.snappyscripts.com/customer/dashboard | EXPLORE TREATMENTS → https://staging.snappyscripts.com/customer/explore-treatments | ORDER HISTORY → https://staging.snappyscripts.com/customer/orders | MY ACCOUNT → https://staging.snappyscripts.com/customer/my-account | PROVIDER MESSAGES → https://staging.snappyscripts.com/customer/medical-advisory | SUPPORT → https://staging.snappyscripts.com/customer/support | View Treatment → https://staging.snappyscripts.com/customer/treatment-details/2023\n"
+                        },
+                        {
+                          "text": "         buttons: (none)\n"
+                        },
+                        {
+                          "text": "   🧾 DOM dumped: test-results\\flow-steps\\cancel-search-1.html\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\19-cancel-search-1.png\n"
+                        },
+                        {
+                          "text": "      → Opening \"my\\s*treatments?\" to look for Cancel Treatment\n"
+                        },
+                        {
+                          "text": "      → Opening \"order\\s*history\" to look for Cancel Treatment\n"
+                        },
+                        {
+                          "text": "      🔍 Looking for Cancel Treatment on nav \"order\\s*history\": https://staging.snappyscripts.com/customer/orders\n"
+                        },
+                        {
+                          "text": "      🔎 [nav \"order\\s*history\"] https://staging.snappyscripts.com/customer/orders\n"
+                        },
+                        {
+                          "text": "         links:    → https://staging.snappyscripts.com | MY TREATMENTS → https://staging.snappyscripts.com/customer/dashboard | EXPLORE TREATMENTS → https://staging.snappyscripts.com/customer/explore-treatments | ORDER HISTORY → https://staging.snappyscripts.com/customer/orders | MY ACCOUNT → https://staging.snappyscripts.com/customer/my-account | PROVIDER MESSAGES → https://staging.snappyscripts.com/customer/medical-advisory | SUPPORT → https://staging.snappyscripts.com/customer/support |  → https://staging.snappyscripts.com/customer/order-details/2023 | 1 → #\n"
+                        },
+                        {
+                          "text": "         buttons: (none)\n"
+                        },
+                        {
+                          "text": "   🧾 DOM dumped: test-results\\flow-steps\\cancel-search-2.html\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\20-cancel-search-2.png\n"
+                        },
+                        {
+                          "text": "      → Opening \"my\\s*account\" to look for Cancel Treatment\n"
+                        },
+                        {
+                          "text": "      🔍 Looking for Cancel Treatment on nav \"my\\s*account\": https://staging.snappyscripts.com/customer/my-account\n"
+                        },
+                        {
+                          "text": "      🔎 [nav \"my\\s*account\"] https://staging.snappyscripts.com/customer/my-account\n"
+                        },
+                        {
+                          "text": "         links:    → https://staging.snappyscripts.com | MY TREATMENTS → https://staging.snappyscripts.com/customer/dashboard | EXPLORE TREATMENTS → https://staging.snappyscripts.com/customer/explore-treatments | ORDER HISTORY → https://staging.snappyscripts.com/customer/orders | MY ACCOUNT → https://staging.snappyscripts.com/customer/my-account | PROVIDER MESSAGES → https://staging.snappyscripts.com/customer/medical-advisory | SUPPORT → https://staging.snappyscripts.com/customer/support\n"
+                        },
+                        {
+                          "text": "         buttons: Login & Security | Address | Cards | Cancel | Save Changes | Change Password\n"
+                        },
+                        {
+                          "text": "   🧾 DOM dumped: test-results\\flow-steps\\cancel-search-3.html\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\21-cancel-search-3.png\n"
+                        },
+                        {
+                          "text": "      → Visiting https://staging.snappyscripts.com/customer/explore-treatments\n"
+                        },
+                        {
+                          "text": "      🔍 Looking for Cancel Treatment on link /customer/explore-treatments: https://staging.snappyscripts.com/customer/explore-treatments\n"
+                        },
+                        {
+                          "text": "      🔎 [link /customer/explore-treatments] https://staging.snappyscripts.com/customer/explore-treatments\n"
+                        },
+                        {
+                          "text": "         links:    → https://staging.snappyscripts.com | MY TREATMENTS → https://staging.snappyscripts.com/customer/dashboard | EXPLORE TREATMENTS → https://staging.snappyscripts.com/customer/explore-treatments | ORDER HISTORY → https://staging.snappyscripts.com/customer/orders | MY ACCOUNT → https://staging.snappyscripts.com/customer/my-account | PROVIDER MESSAGES → https://staging.snappyscripts.com/customer/medical-advisory | SUPPORT → https://staging.snappyscripts.com/customer/support | Get Started Today → → https://staging.snappyscripts.com/nd-in | Get Started Today → → https://staging.snappyscripts.com/gt-in | Get Started Today → → https://staging.snappyscripts.com/sr-in | Get Started Today → → https://staging.snappyscripts.com/nd-sp | Get Started Today → → https://staging.snappyscripts.com/ngm-tb | Get Started Today → → https://staging.snappyscripts.com/mt-tb\n"
+                        },
+                        {
+                          "text": "         buttons: All Treatments | Longevity | Performance | Restoration | Metabolic Health | View More Treatments ↓\n"
+                        },
+                        {
+                          "text": "   🧾 DOM dumped: test-results\\flow-steps\\cancel-search-4.html\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\22-cancel-search-4.png\n"
+                        },
+                        {
+                          "text": "      → Visiting https://staging.snappyscripts.com/customer/medical-advisory\n"
+                        },
+                        {
+                          "text": "      🔍 Looking for Cancel Treatment on link /customer/medical-advisory: https://staging.snappyscripts.com/customer/medical-advisory\n"
+                        },
+                        {
+                          "text": "      🔎 [link /customer/medical-advisory] https://staging.snappyscripts.com/customer/medical-advisory\n"
+                        },
+                        {
+                          "text": "         links:    → https://staging.snappyscripts.com | MY TREATMENTS → https://staging.snappyscripts.com/customer/dashboard | EXPLORE TREATMENTS → https://staging.snappyscripts.com/customer/explore-treatments | ORDER HISTORY → https://staging.snappyscripts.com/customer/orders | MY ACCOUNT → https://staging.snappyscripts.com/customer/my-account | PROVIDER MESSAGES → https://staging.snappyscripts.com/customer/medical-advisory | SUPPORT → https://staging.snappyscripts.com/customer/support\n"
+                        },
+                        {
+                          "text": "         buttons:  | Send\n"
+                        },
+                        {
+                          "text": "   🧾 DOM dumped: test-results\\flow-steps\\cancel-search-5.html\n"
+                        },
+                        {
+                          "text": "   📸 test-results\\flow-steps\\23-cancel-search-5.png\n"
+                        },
+                        {
+                          "text": "      → Visiting https://staging.snappyscripts.com/customer/treatment-details/2023\n"
+                        },
+                        {
+                          "text": "      🔍 Looking for Cancel Treatment on link /customer/treatment-details/2023: https://staging.snappyscripts.com/customer/treatment-details/2023\n"
+                        },
+                        {
+                          "text": "      🧾 Order ID candidate \"96E0059DEB\" (source: cancel-page)\n"
                         },
                         {
                           "text": "      ✓ Clicked \"Cancel Treatment\"\n"
                         },
                         {
-                          "text": "   📸 test-results\\flow-steps\\18-cancel-treatment-clicked.png\n"
+                          "text": "   📸 test-results\\flow-steps\\24-cancel-treatment-clicked.png\n"
                         },
                         {
                           "text": "      ✓ Clicked cancel confirmation: \"Cancel Treatment\"\n"
                         },
                         {
-                          "text": "   📸 test-results\\flow-steps\\19-cancel-treatment-confirm-1.png\n"
+                          "text": "   📸 test-results\\flow-steps\\25-cancel-treatment-confirm-1.png\n"
                         },
                         {
-                          "text": "   📸 test-results\\flow-steps\\20-cancel-treatment-final.png\n"
+                          "text": "   📸 test-results\\flow-steps\\26-cancel-treatment-final.png\n"
                         },
                         {
-                          "text": "   ✅ Cancellation message detected\n"
+                          "text": "   🧾 DOM dumped: test-results\\flow-steps\\cancel-treatment-final.html\n"
                         },
                         {
                           "text": "\n════════════════════════════════════════════════════════════\n"
@@ -698,19 +824,22 @@
                           "text": "════════════════════════════════════════════════════════════\n"
                         },
                         {
-                          "text": " 📧 Email ID : qa+1791443908702@yopmail.com\n"
+                          "text": " 📧 Email ID : qa+1793346474575@yopmail.com\n"
                         },
                         {
-                          "text": " 🧾 Order ID : 95ED1E5C37\n"
+                          "text": " 📱 Phone    : (212) 555-4575\n"
+                        },
+                        {
+                          "text": " 🧾 Order ID : 96E0059DEB\n"
                         },
                         {
                           "text": "    (source: cancel-page)\n"
                         },
                         {
-                          "text": "    other candidates: 95ED1E5C37 [confirmation], 95ED1E5C37 [cancel-page]\n"
+                          "text": "    other candidates: 96E0059DEB [confirmation], 96E0059DEB [cancel-page]\n"
                         },
                         {
-                          "text": " ✅ Cancelled: yes (confirmed in app)\n"
+                          "text": " ✅ Cancelled: clicked — see Order History result\n"
                         },
                         {
                           "text": "════════════════════════════════════════════════════════════\n\n"
@@ -722,19 +851,19 @@
                           "text": "      → Clicking \"order\\s*history\" to reach order history\n"
                         },
                         {
-                          "text": "      ✓ Order History opened (link order\\s*history): https://staging.snappyscripts.com/customer/dashboard\n"
+                          "text": "      ✓ Order History opened (link order\\s*history): https://staging.snappyscripts.com/customer/orders\n"
                         },
                         {
-                          "text": "   📸 test-results\\flow-steps\\21-order-history-opened.png\n"
+                          "text": "   📸 test-results\\flow-steps\\27-order-history-opened.png\n"
                         },
                         {
-                          "text": "      🧾 Order ID candidate \"95ED1E5C37\" (source: order-history)\n"
+                          "text": "      • Not showing Cancelled yet — reloading Order History once\n"
                         },
                         {
-                          "text": "   📸 test-results\\flow-steps\\22-order-history-final.png\n"
+                          "text": "   📸 test-results\\flow-steps\\28-order-history-final.png\n"
                         },
                         {
-                          "text": "      ✓ Order History shows: \"Treatment Canceled\"\n"
+                          "text": "      ✓ Order History shows: \"Cancelled\"\n"
                         },
                         {
                           "text": "\n════════════════════════════════════════════════════════════\n"
@@ -746,16 +875,19 @@
                           "text": "════════════════════════════════════════════════════════════\n"
                         },
                         {
-                          "text": " 📧 Email ID : qa+1791443908702@yopmail.com\n"
+                          "text": " 📧 Email ID : qa+1793346474575@yopmail.com\n"
                         },
                         {
-                          "text": " 🧾 Order ID : 95ED1E5C37\n"
+                          "text": " 📱 Phone    : (212) 555-4575\n"
                         },
                         {
-                          "text": "    (source: order-history)\n"
+                          "text": " 🧾 Order ID : 96E0059DEB\n"
                         },
                         {
-                          "text": "    other candidates: 95ED1E5C37 [confirmation], 95ED1E5C37 [cancel-page], 95ED1E5C37 [order-history]\n"
+                          "text": "    (source: cancel-page)\n"
+                        },
+                        {
+                          "text": "    other candidates: 96E0059DEB [confirmation], 96E0059DEB [cancel-page]\n"
                         },
                         {
                           "text": " ✅ Cancelled: yes (confirmed in app)\n"
@@ -764,7 +896,7 @@
                           "text": "════════════════════════════════════════════════════════════\n\n"
                         },
                         {
-                          "text": "   ✅ Order History confirms cancellation: \"Treatment Canceled\"\n"
+                          "text": "   ✅ Order History confirms cancellation: \"Cancelled\"\n"
                         },
                         {
                           "text": "\n[STEP 8] Post-run diagnostics...\n"
@@ -776,16 +908,34 @@
                           "text": " ✅ ORDER PLACED, TREATMENT CANCELLED, ORDER HISTORY SHOWS CANCELLED\n"
                         },
                         {
-                          "text": " 📧 Email ID : qa+1791443908702@yopmail.com\n"
+                          "text": " 📧 Email ID : qa+1793346474575@yopmail.com\n"
                         },
                         {
-                          "text": " 🧾 Order ID : 95ED1E5C37\n"
+                          "text": " 📱 Phone    : (212) 555-4575\n"
+                        },
+                        {
+                          "text": " 🧾 Order ID : 96E0059DEB\n"
                         },
                         {
                           "text": "═══════════════════════════════════════════════\n\n"
                         }
                       ],
                       "stderr": [
+                        {
+                          "text": "   ⚠ Address field still \"t\" after attempt 1\n"
+                        },
+                        {
+                          "text": "   ⚠ Address field still \"6202 E Test Dr\" after attempt 2\n"
+                        },
+                        {
+                          "text": "   ⚠ Address field still \"6202 E Test Dr\" after attempt 3\n"
+                        },
+                        {
+                          "text": "   ⚠ Autocomplete never produced a selectable address — filling manually\n"
+                        },
+                        {
+                          "text": "   ⚠ Clicked Cancel Treatment + confirmation but no \"cancelled\" message appeared — Order History will be the source of truth\n"
+                        },
                         {
                           "text": "   ⚠ 2 console error(s):\n"
                         },
@@ -796,32 +946,32 @@
                           "text": "      • Pattern attribute value ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z]{2,}$ is not a valid regular expression: Uncaught SyntaxError: Failed to execute 'ch\n"
                         },
                         {
-                          "text": "   ⚠ 80 failed request(s):\n"
+                          "text": "   ⚠ 201 failed request(s):\n"
                         },
                         {
                           "text": "      • https://www.googletagmanager.com/gtag/js?id=G-QEDJZQKSZC → net::ERR_BLOCKED_BY_ORB\n"
                         },
                         {
-                          "text": "      • https://io.v2.customerlabs.co/cl → net::ERR_ABORTED\n"
+                          "text": "      • https://www.googletagmanager.com/gtag/js?id=G-QEDJZQKSZC&cx=c&gtm=4e6as1 → net::ERR_BLOCKED_BY_ORB\n"
                         },
                         {
-                          "text": "      • https://io.v2.customerlabs.co/cl → net::ERR_ABORTED\n"
+                          "text": "      • https://www.google.com/ccm/collect?rcb=5&frm=0&apvc=1&auid=1372424604.1793346480&dt=Snappy%20Scripts%20-%20Now%20access% → net::ERR_ABORTED\n"
                         },
                         {
-                          "text": "      • https://io.v2.customerlabs.co/cl → net::ERR_ABORTED\n"
+                          "text": "      • https://www.google.com/rmkt/collect/11198340090/?random=1793346479886&cv=11&fst=1793346479886&fmt=8&bg=ffffff&guid=ON&as → net::ERR_ABORTED\n"
                         },
                         {
-                          "text": "      • https://io.v2.customerlabs.co/cl → net::ERR_ABORTED\n"
+                          "text": "      • https://www.google-analytics.com/g/collect?v=2&tid=G-VG7VP470XV&gtm=45be6as1v9166918401za208zd9166918401xf1&_p=179334647 → net::ERR_ABORTED\n"
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-10-08T07:18:28.711Z",
+                      "startTime": "2026-10-30T07:47:54.584Z",
                       "annotations": [
                         {
                           "type": "serial",
                           "location": {
                             "file": "D:\\Projects\\Snappy\\snappy-scripts-e2e\\tests\\08-full-order-flow.spec.js",
-                            "line": 2640,
+                            "line": 3027,
                             "column": 6
                           }
                         }
@@ -834,7 +984,7 @@
               ],
               "id": "d74bd6aebf9ec0899685-a242bbcfb44b4077359c",
               "file": "08-full-order-flow.spec.js",
-              "line": 2644,
+              "line": 3031,
               "column": 3
             }
           ]
@@ -844,8 +994,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-10-08T07:18:27.018Z",
-    "duration": 316315.41400000005,
+    "startTime": "2026-10-30T07:47:53.757Z",
+    "duration": 271104.084,
     "expected": 1,
     "skipped": 0,
     "unexpected": 0,
